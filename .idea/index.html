@@ -5,34 +5,73 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sacola de Compras - Açaiteria</title>
   <style>
-    body { font-family: Arial; padding: 20px; width: 100%; margin-top: 0%;margin-bottom: 0%;}
-    h2, h3 { margin-top: 30px; }
-    .grupo { margin-bottom: 20px; }
-    label { display: inline-block; width: 220px; }
-    input[type="number"] { width: 60px; padding: 4px; }
-    button { margin-top: 15px; padding: 8px 16px; }
-    ul { padding-left: 20px; }
-    @media print {
-      button { display: none; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      width: 100%;
+      min-height: 100vh;
+      box-sizing: border-box;
+      font-size: clamp(1rem, 4vw, 1.5rem); /* texto responsivo */
+      background: #fff;
     }
-    .topo{display: flex;align-items: center; justify-content: center; margin: 3%;}
-    .topo img {width: 40%;margin: 3%;}
-    #pedido-finalizado {margin: auto;}
-    #detalhes-pedido { margin: auto;}
-    #detalhes-pedido div{ margin: 5px;}
+
+    body {
+      padding: 5vw;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    h2, h3, h4 {
+      margin-top: 2em;
+      font-size: clamp(1.4rem, 5vw, 2rem);
+    }
+
+    .grupo {
+      margin-bottom: 2em;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.8em;
+      font-size: 1em;
+    }
+
+    input[type="number"],
+    button {
+      font-size: clamp(1rem, 4vw, 1.2rem);
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 1em;
+      cursor: pointer;
+    }
+
+    ul {
+      padding-left: 1em;
+    }
+
+    #acompanhamentos h4 {
+      margin-top: 1.5em;
+      margin-bottom: 0.5em;
+    }
+
+    .espaco {
+      margin-bottom: 2em;
+    }
+    img {width: 70%;}
   </style>
 </head>
 <body>
-
-  <div class="topo">
-    <img src="/procopios.png" alt="">
-  </div>
+  <img src="procopios.png" alt="">
 
   <div class="grupo">
     <h3>Produto</h3>
     <div id="produtos"></div>
-    <br>
-    <label>Quantidade:</label>
+    <label for="quantidade">Quantidade:</label>
     <input type="number" min="1" max="10" id="quantidade" value="1">
   </div>
 
@@ -42,9 +81,9 @@
 
   <button onclick="adicionarItens()">Adicionar à Sacola</button>
   <button onclick="fecharPedido()">Fechar Pedido</button>
-  <button onclick="esvaziarSacola()">Esvaziar Sacola</button>
+  <button onclick="recomecar()">Recomeçar</button>
 
-  <div id="resumo">
+  <div id="resumo" class="grupo">
     <h3>Sacola de Compras:</h3>
     <ul id="lista-sacola"></ul>
   </div>
@@ -52,7 +91,7 @@
   <div id="pedido-finalizado" style="display:none">
     <h3>Pedido Finalizado:</h3>
     <div id="detalhes-pedido"></div>
-    <button onclick="recomecarPedido()">Recomeçar</button>
+    <button onclick="recomecar()">Recomeçar</button>
   </div>
 
   <script>
@@ -84,8 +123,6 @@
       'Ninho 400ml', 'Ninho 500ml'
     ];
 
-    const produtos = Object.keys(precos);
-
     const acompanhamentosLista = {
       "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate'],
       "Farinhas": ['Leite', 'Paçoca', 'Granola'],
@@ -94,9 +131,8 @@
       "Adicionais": ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
     };
 
-
     const produtosDiv = document.getElementById("produtos");
-    produtos.forEach(prod => {
+    Object.keys(precos).forEach(prod => {
       const label = document.createElement("label");
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
@@ -106,16 +142,14 @@
       label.appendChild(checkbox);
       label.appendChild(document.createTextNode(prod + " - R$ " + precos[prod].toFixed(2)));
       produtosDiv.appendChild(label);
-      produtosDiv.appendChild(document.createElement("br"));
     });
 
     const acompDiv = document.getElementById("acompanhamentos");
-    for (const [categoria, lista] of Object.entries(acompanhamentosLista)) {
-      const titulo = document.createElement("h4");
-      titulo.textContent = categoria;
-      acompDiv.appendChild(titulo);
-
-      lista.forEach(acomp => {
+    for (const [categoria, itens] of Object.entries(acompanhamentosLista)) {
+      const h4 = document.createElement("h4");
+      h4.textContent = categoria;
+      acompDiv.appendChild(h4);
+      itens.forEach(acomp => {
         const label = document.createElement("label");
         const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
@@ -124,13 +158,8 @@
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(acomp));
         acompDiv.appendChild(label);
-        acompDiv.appendChild(document.createElement("br"));
       });
-
-      // Espaço visual entre categorias
-      acompDiv.appendChild(document.createElement("br"));
     }
-
 
     function mostrarAcompanhamentos() {
       const selecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
@@ -177,6 +206,7 @@
       const container = document.getElementById("pedido-finalizado");
       const detalhes = document.getElementById("detalhes-pedido");
       detalhes.innerHTML = "";
+      document.getElementById("resumo").style.display = "none";
       if (sacola.length === 0) {
         alert("Sua sacola está vazia.");
         return;
@@ -186,58 +216,27 @@
         const div = document.createElement("div");
         div.innerHTML = `<strong>${item.qtd}x ${item.produto}</strong><br>`;
 
-        const categorias = {
-          Cobertura: ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate'],
-          Farinhas: ['Leite', 'Paçoca', 'Granola'],
-          Guloseimas: ['Confete', 'Chocoball', 'Jujuba'],
-          Frutas: ['Banana', 'Uva', 'Morango (Fruta)'],
-          Adicionais: ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
-        };
-
+        const categorias = acompanhamentosLista;
         for (const [categoria, itens] of Object.entries(categorias)) {
           const filtrados = item.acompanhamentos.filter(acomp => itens.includes(acomp));
           if (filtrados.length > 0) {
             div.innerHTML += `<strong>${categoria}:</strong> ${filtrados.join(", ")}<br>`;
           }
         }
-
         div.innerHTML += '<br>';
         detalhes.appendChild(div);
       });
 
       container.style.display = "block";
-
-      // Esconde os controles
-      document.getElementById("resumo").style.display = "none";
-      document.querySelector(".grupo").style.display = "none";
-      document.querySelector("button[onclick='adicionarItens()']").style.display = "none";
-      document.querySelector("button[onclick='fecharPedido()']").style.display = "none";
-      document.querySelector("button[onclick='esvaziarSacola()']").style.display = "none";
-
-      // Imprimir o resumo
-      window.print();
     }
 
-    function recomecarPedido() {
+    function recomecar() {
       sacola.length = 0;
-      atualizarSacola();
-      limparCampos();
-
-      // Mostra tudo de novo
+      document.getElementById("lista-sacola").innerHTML = "";
+      document.getElementById("detalhes-pedido").innerHTML = "";
       document.getElementById("pedido-finalizado").style.display = "none";
       document.getElementById("resumo").style.display = "block";
-      document.querySelector(".grupo").style.display = "block";
-      document.querySelector("button[onclick='adicionarItens()']").style.display = "inline-block";
-      document.querySelector("button[onclick='fecharPedido()']").style.display = "inline-block";
-      document.querySelector("button[onclick='esvaziarSacola()']").style.display = "inline-block";
-    }
-
-    function esvaziarSacola() {
-      if (confirm("Deseja realmente esvaziar a sacola?")) {
-        sacola.length = 0;
-        atualizarSacola();
-        document.getElementById("pedido-finalizado").style.display = "none";
-      }
+      limparCampos();
     }
   </script>
 </body>
