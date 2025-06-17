@@ -5,6 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sacola de Compras - Açaiteria</title>
   <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      #botao-recomecar, #pedidoF {
+        display: none !important;
+      }
+
+      #pedido-finalizado, #pedido-finalizado * {
+        visibility: visible;
+      }
+
+      #pedido-finalizado {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 20px;
+        width: 100%;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+      }
+
+      #pedido-finalizado strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 18px;
+      }
+
+      .pedido-item {
+        margin-bottom: 30px;
+        line-height: 1.5;
+      }
+
+      .pedido-logo {
+        width: 150px;
+        margin-bottom: 20px;
+      }
+    }
+
     html, body {
       margin: 0;
       padding: 0;
@@ -90,9 +130,9 @@
   </div>
 
   <div id="pedido-finalizado" style="display:none">
-    <h3>Pedido Finalizado:</h3>
+    <h3 id="pedidoF">Pedido Finalizado:</h3>
     <div id="detalhes-pedido"></div>
-    <button onclick="recomecar()">Recomeçar</button>
+    <button id="botao-recomecar" onclick="recomecar()">Recomeçar</button>
   </div>
 
   <script>
@@ -204,41 +244,59 @@
     }
 
     function fecharPedido() {
-      const container = document.getElementById("pedido-finalizado");
-      const detalhes = document.getElementById("detalhes-pedido");
-      detalhes.innerHTML = "";
-      document.getElementById("resumo").style.display = "none";
+  const container = document.getElementById("pedido-finalizado");
+  const detalhes = document.getElementById("detalhes-pedido");
+  detalhes.innerHTML = "";
+  document.getElementById("resumo").style.display = "none";
 
-      if (sacola.length === 0) {
-        alert("Sua sacola está vazia.");
-        return;
+  if (sacola.length === 0) {
+    alert("Sua sacola está vazia.");
+    return;
+  }
+
+  const logo = document.createElement("img");
+  logo.src = "procopios.png";
+  logo.alt = "Procópio’s Açaí";
+  logo.className = "pedido-logo";
+  detalhes.appendChild(logo);
+
+  let total = 0;
+
+  sacola.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "pedido-item";
+
+    div.innerHTML = `<strong>${item.qtd}x ${item.produto} • R$ ${item.preco.toFixed(2)}</strong>`;
+
+    const categorias = {
+      Coberturas: ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de morango', 'Calda de Chocolate'],
+      Farinhas: ['Leite', 'Paçoca', 'Granola'],
+      Guloseimas: ['Confete', 'Chocoball', 'Jujuba'],
+      Frutas: ['Banana', 'Uva', 'Morango (Fruta)', 'Morango'],
+      Adicionais: ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
+    };
+
+    for (const [categoria, itens] of Object.entries(categorias)) {
+      const filtrados = item.acompanhamentos.filter(a => itens.includes(a));
+      if (filtrados.length > 0) {
+        div.innerHTML += `<br>${categoria}: <strong>${filtrados.join(", ")}</strong>`;
       }
-
-      let total = 0;
-
-      sacola.forEach(item => {
-        const div = document.createElement("div");
-        div.innerHTML = `<strong>${item.qtd}x ${item.produto}</strong> - R$ ${item.preco.toFixed(2)}<br>`;
-
-        const categorias = acompanhamentosLista;
-        for (const [categoria, itens] of Object.entries(categorias)) {
-          const filtrados = item.acompanhamentos.filter(acomp => itens.includes(acomp));
-          if (filtrados.length > 0) {
-            div.innerHTML += `<strong>${categoria}:</strong> ${filtrados.join(", ")}<br>`;
-          }
-        }
-
-        total += item.preco;
-        div.innerHTML += `<br>`;
-        detalhes.appendChild(div);
-      });
-
-      const totalDiv = document.createElement("div");
-      totalDiv.innerHTML = `<strong>Total do pedido:</strong> R$ ${total.toFixed(2)}`;
-      detalhes.appendChild(totalDiv);
-
-      container.style.display = "block";
     }
+
+    detalhes.appendChild(div);
+    total += item.preco;
+  });
+
+  const totalDiv = document.createElement("div");
+  totalDiv.innerHTML = `<strong>Total do pedido:</strong> R$ ${total.toFixed(2)}`;
+  detalhes.appendChild(totalDiv);
+
+  container.style.display = "block";
+
+  // Imprimir apenas o resumo
+  window.print();
+}
+
 
 
     function recomecar() {
