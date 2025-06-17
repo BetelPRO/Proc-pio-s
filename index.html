@@ -157,19 +157,39 @@
       'Áurea': 14
     };
 
-    const produtosComAcompanhamentos = [
+    // Produtos que sempre mostram todos os acompanhamentos gerais (excluindo os que terão específicos)
+    const produtosComAcompanhamentosGerais = [
       'Açaí 300ml', 'Açaí 400ml', 'Açaí 500ml',
       'Açaí com Cupuaçu 300ml', 'Açaí com Cupuaçu 400ml', 'Açaí com Cupuaçu 500ml',
       'Cupuaçu 300ml', 'Cupuaçu 400ml', 'Cupuaçu 500ml',
-      'Ninho 400ml', 'Ninho 500ml'
+      'Ninho 400ml', 'Ninho 500ml',
+      // Solis não tem acompanhamento específico, então pode vir para cá se precisar de adicionais/frutas
+      'Solis' // Se Solis também deve permitir Adicionais/Morango/Uva
     ];
 
+    // Produtos que terão acompanhamentos estritamente específicos (e os "universais")
+    const produtosComAcompanhamentosEspecificos = {
+        'Rubra': ['Leite Condensado', 'Morango (Fruta)'], // Morango (Fruta) já está no universal
+        'Belga': ['Leite Condensado', 'Chocoball'], // Chocoball já está no universal
+        'Sicília': ['Leite Condensado', 'Uva'], // Uva já está no universal
+        'Áurea': ['Leite Condensado']
+    };
+
+    // Acompanhamentos que estarão SEMPRE disponíveis quando a seção de acompanhamentos aparecer
+    const acompanhamentosUniversais = [
+        'Leite Condensado', // Geralmente é cobertura
+        'Morango (Fruta)',
+        'Uva',
+        'Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini'
+    ];
+
+    // Acompanhamentos por categoria - alguns serão tratados como universais
     const acompanhamentosLista = {
-      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate'],
+      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate'], // Leite Condensado será tratado como universal na exibição
       "Farinhas": ['Leite', 'Paçoca', 'Granola'],
-      "Guloseimas": ['Confete', 'Chocoball', 'Jujuba'],
-      "Frutas": ['Banana', 'Uva', 'Morango (Fruta)'],
-      "Adicionais": ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
+      "Guloseimas": ['Confete', 'Chocoball', 'Jujuba'], // Chocoball será tratado como universal na exibição
+      "Frutas": ['Banana', 'Uva', 'Morango (Fruta)'], // Uva e Morango (Fruta) serão tratados como universais na exibição
+      "Adicionais": ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini'] // Adicionais serão tratados como universais na exibição
     };
 
     const produtosDiv = document.getElementById("produtos");
@@ -186,40 +206,133 @@
     });
 
     const acompDiv = document.getElementById("acompanhamentos");
+    // Preenche a div de acompanhamentos com todos os checkboxes (inicialmente escondidos)
     for (const [categoria, itens] of Object.entries(acompanhamentosLista)) {
-      const h4 = document.createElement("h4");
-      h4.textContent = categoria;
-      acompDiv.appendChild(h4);
-      itens.forEach(acomp => {
-        const label = document.createElement("label");
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.name = "acompanhamento";
-        checkbox.value = acomp;
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(acomp));
-        acompDiv.appendChild(label);
-      });
+        const h4 = document.createElement("h4");
+        h4.textContent = categoria;
+        h4.className = 'acomp-categoria';
+        acompDiv.appendChild(h4);
+        itens.forEach(acomp => {
+            const label = document.createElement("label");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.name = "acompanhamento";
+            checkbox.value = acomp;
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(acomp));
+            label.className = 'acomp-item-label';
+            acompDiv.appendChild(label);
+        });
     }
 
     function mostrarAcompanhamentos() {
-      const selecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
-      const nomes = selecionados.map(p => p.value);
-      const deveMostrar = nomes.some(nome => produtosComAcompanhamentos.includes(nome));
-      document.getElementById("acompanhamentos").style.display = deveMostrar ? "block" : "none";
+        const produtosSelecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
+        const acompDiv = document.getElementById("acompanhamentos");
+
+        // Esconde todos os acompanhamentos e suas categorias primeiro
+        document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('input[name="acompanhamento"]').forEach(cb => cb.checked = false); // Desmarca tudo
+
+        if (produtosSelecionados.length === 0) {
+            acompDiv.style.display = "none";
+            return;
+        }
+
+        acompDiv.style.display = "block"; // Garante que a div principal de acompanhamentos esteja visível
+
+        let produtosGeraisAtivos = produtosSelecionados.some(p => produtosComAcompanhamentosGerais.includes(p.value));
+        let produtosEspecificosAtivos = produtosSelecionados.some(p => produtosComAcompanhamentosEspecificos[p.value]);
+
+        if (produtosGeraisAtivos) {
+            // Se algum produto geral foi selecionado, mostra todos os acompanhamentos (exceto os que seriam só específicos)
+            document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'block');
+        } else if (produtosEspecificosAtivos) {
+            // Se APENAS produtos específicos foram selecionados, mostramos os específicos + os universais
+            let acompanhamentosParaExibir = new Set(acompanhamentosUniversais); // Começa com os universais
+
+            produtosSelecionados.forEach(prodSelecionado => {
+                const especificosDoProd = produtosComAcompanhamentosEspecificos[prodSelecionado.value];
+                if (especificosDoProd) {
+                    especificosDoProd.forEach(acomp => acompanhamentosParaExibir.add(acomp));
+                }
+            });
+
+            // Itera sobre todos os labels e mostra apenas os relevantes
+            document.querySelectorAll('.acomp-item-label').forEach(label => {
+                const checkbox = label.querySelector('input[type="checkbox"]');
+                if (acompanhamentosParaExibir.has(checkbox.value)) {
+                    label.style.display = 'block'; // Mostra o checkbox
+
+                    // Encontra e mostra a categoria pai desse acompanhamento
+                    for (const [catNome, itensDaCategoria] of Object.entries(acompanhamentosLista)) {
+                        if (itensDaCategoria.includes(checkbox.value)) {
+                            const categoriaH4 = Array.from(document.querySelectorAll('.acomp-categoria')).find(h4 => h4.textContent === catNome);
+                            if (categoriaH4) {
+                                categoriaH4.style.display = 'block'; // Mostra a categoria
+                            }
+                            break;
+                        }
+                    }
+                }
+            });
+        } else {
+            // Nenhum produto selecionado que precise de acompanhamento
+            acompDiv.style.display = "none";
+        }
+
+        // Garante que a seção de acompanhamentos apareça na tela, se estiver visível
+        if (acompDiv.style.display === "block") {
+            setTimeout(() => {
+                acompDiv.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 200);
+        }
     }
+
 
     function adicionarItens() {
       const produtosSelecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
       const acompSelecionados = Array.from(document.querySelectorAll('input[name="acompanhamento"]:checked'));
       const qtd = parseInt(document.getElementById("quantidade").value);
 
+      if (produtosSelecionados.length === 0) {
+        alert("Por favor, selecione ao menos um produto.");
+        return;
+      }
+
       produtosSelecionados.forEach(p => {
+        let acompanhamentosFinaisParaEsteItem = [];
+        let isGeralProduct = produtosComAcompanhamentosGerais.includes(p.value);
+        let isSpecificProduct = produtosComAcompanhamentosEspecificos[p.value];
+
+        if (isGeralProduct) {
+            // Se é um produto geral, todos os acompanhamentos marcados são válidos
+            acompanhamentosFinaisParaEsteItem = acompSelecionados.map(a => a.value);
+        } else if (isSpecificProduct) {
+            // Se é um produto específico, combinamos os acompanhamentos permitidos para ele
+            // com os acompanhamentos universais.
+            const permitidosEspecificos = produtosComAcompanhamentosEspecificos[p.value];
+            const todosAcompanhamentosPermitidos = new Set([...permitidosEspecificos, ...acompanhamentosUniversais]);
+
+            acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => todosAcompanhamentosPermitidos.has(a.value)).map(a => a.value);
+
+        } else {
+            // Se é um produto sem lógica de acompanhamento específica, mas deve permitir universais
+            // Isso cobre casos como "Solis" se ele não estiver em produtosComAcompanhamentosGerais,
+            // mas você quer que ele permita universais.
+            // No seu setup atual, Solis já está em produtosComAcompanhamentosGerais, então essa parte
+            // pode ser simplificada ou removida se não houver outros produtos nesse caso.
+            acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => acompanhamentosUniversais.includes(a.value)).map(a => a.value);
+        }
+
+        // Garante que não haja duplicatas nos acompanhamentos adicionados à sacola
+        acompanhamentosFinaisParaEsteItem = [...new Set(acompanhamentosFinaisParaEsteItem)];
+
+
         sacola.push({
           produto: p.value,
           qtd: qtd,
           preco: precos[p.value] * qtd,
-          acompanhamentos: produtosComAcompanhamentos.includes(p.value) ? acompSelecionados.map(a => a.value) : []
+          acompanhamentos: acompanhamentosFinaisParaEsteItem
         });
       });
 
@@ -241,63 +354,61 @@
       document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
       document.getElementById("quantidade").value = 1;
       document.getElementById("acompanhamentos").style.display = "none";
+      document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
     }
 
     function fecharPedido() {
-  const container = document.getElementById("pedido-finalizado");
-  const detalhes = document.getElementById("detalhes-pedido");
-  detalhes.innerHTML = "";
-  document.getElementById("resumo").style.display = "none";
+        const container = document.getElementById("pedido-finalizado");
+        const detalhes = document.getElementById("detalhes-pedido");
+        detalhes.innerHTML = "";
+        document.getElementById("resumo").style.display = "none";
 
-  if (sacola.length === 0) {
-    alert("Sua sacola está vazia.");
-    return;
-  }
+        if (sacola.length === 0) {
+            alert("Sua sacola está vazia.");
+            return;
+        }
 
-  const logo = document.createElement("img");
-  logo.src = "procopios.png";
-  logo.alt = "Procópio’s Açaí";
-  logo.className = "pedido-logo";
-  detalhes.appendChild(logo);
+        const logo = document.createElement("img");
+        logo.src = "procopios.png";
+        logo.alt = "Procópio’s Açaí";
+        logo.className = "pedido-logo";
+        detalhes.appendChild(logo);
 
-  let total = 0;
+        let total = 0;
 
-  sacola.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "pedido-item";
+        sacola.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "pedido-item";
 
-    div.innerHTML = `<strong>${item.qtd}x ${item.produto} • R$ ${item.preco.toFixed(2)}</strong>`;
+            div.innerHTML = `<strong>${item.qtd}x ${item.produto} • R$ ${item.preco.toFixed(2)}</strong>`;
 
-    const categorias = {
-      Coberturas: ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de morango', 'Calda de Chocolate'],
-      Farinhas: ['Leite', 'Paçoca', 'Granola'],
-      Guloseimas: ['Confete', 'Chocoball', 'Jujuba'],
-      Frutas: ['Banana', 'Uva', 'Morango (Fruta)', 'Morango'],
-      Adicionais: ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
-    };
+            const categorias = {
+                Coberturas: ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de morango', 'Calda de Chocolate'],
+                Farinhas: ['Leite', 'Paçoca', 'Granola'],
+                Guloseimas: ['Confete', 'Chocoball', 'Jujuba'],
+                Frutas: ['Banana', 'Uva', 'Morango (Fruta)', 'Morango'],
+                Adicionais: ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
+            };
 
-    for (const [categoria, itens] of Object.entries(categorias)) {
-      const filtrados = item.acompanhamentos.filter(a => itens.includes(a));
-      if (filtrados.length > 0) {
-        div.innerHTML += `<br>${categoria}: <strong>${filtrados.join(", ")}</strong>`;
-      }
+            for (const [categoria, itens] of Object.entries(categorias)) {
+                const filtrados = item.acompanhamentos.filter(a => itens.includes(a));
+                if (filtrados.length > 0) {
+                    div.innerHTML += `<br>${categoria}: <strong>${filtrados.join(", ")}</strong>`;
+                }
+            }
+
+            detalhes.appendChild(div);
+            total += item.preco;
+        });
+
+        const totalDiv = document.createElement("div");
+        totalDiv.innerHTML = `<strong>Total do pedido:</strong> R$ ${total.toFixed(2)}`;
+        detalhes.appendChild(totalDiv);
+
+        container.style.display = "block";
+
+        window.print();
     }
-
-    detalhes.appendChild(div);
-    total += item.preco;
-  });
-
-  const totalDiv = document.createElement("div");
-  totalDiv.innerHTML = `<strong>Total do pedido:</strong> R$ ${total.toFixed(2)}`;
-  detalhes.appendChild(totalDiv);
-
-  container.style.display = "block";
-
-  // Imprimir apenas o resumo
-  window.print();
-}
-
-
 
     function recomecar() {
       sacola.length = 0;
@@ -307,6 +418,6 @@
       document.getElementById("resumo").style.display = "block";
       limparCampos();
     }
-  </script>
+</script>
 </body>
 </html>
