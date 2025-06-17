@@ -208,14 +208,17 @@
       const detalhes = document.getElementById("detalhes-pedido");
       detalhes.innerHTML = "";
       document.getElementById("resumo").style.display = "none";
+
       if (sacola.length === 0) {
         alert("Sua sacola está vazia.");
         return;
       }
 
+      let total = 0;
+
       sacola.forEach(item => {
         const div = document.createElement("div");
-        div.innerHTML = `<strong>${item.qtd}x ${item.produto}</strong><br>`;
+        div.innerHTML = `<strong>${item.qtd}x ${item.produto}</strong> - R$ ${item.preco.toFixed(2)}<br>`;
 
         const categorias = acompanhamentosLista;
         for (const [categoria, itens] of Object.entries(categorias)) {
@@ -224,12 +227,19 @@
             div.innerHTML += `<strong>${categoria}:</strong> ${filtrados.join(", ")}<br>`;
           }
         }
-        div.innerHTML += '<br>';
+
+        total += item.preco;
+        div.innerHTML += `<br>`;
         detalhes.appendChild(div);
       });
 
+      const totalDiv = document.createElement("div");
+      totalDiv.innerHTML = `<strong>Total do pedido:</strong> R$ ${total.toFixed(2)}`;
+      detalhes.appendChild(totalDiv);
+
       container.style.display = "block";
     }
+
 
     function recomecar() {
       sacola.length = 0;
