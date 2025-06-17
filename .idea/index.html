@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sacola de Compras - Açaiteria</title>
+  <style>
+    body { font-family: Arial; padding: 20px; width: 100%; margin-top: 0%;margin-bottom: 0%;}
+    h2, h3 { margin-top: 30px; }
+    .grupo { margin-bottom: 20px; }
+    label { display: inline-block; width: 220px; }
+    input[type="number"] { width: 60px; padding: 4px; }
+    button { margin-top: 15px; padding: 8px 16px; }
+    ul { padding-left: 20px; }
+    @media print {
+      button { display: none; }
+    }
+    .topo{display: flex;align-items: center; justify-content: center; margin: 3%;}
+    .topo img {width: 40%;margin: 3%;}
+    #pedido-finalizado {margin: auto;}
+    #detalhes-pedido { margin: auto;}
+    #detalhes-pedido div{ margin: 5px;}
+  </style>
+</head>
+<body>
+
+  <div class="topo">
+    <img src="/procopios.png" alt="">
+  </div>
+
+  <div class="grupo">
+    <h3>Produto</h3>
+    <div id="produtos"></div>
+    <br>
+    <label>Quantidade:</label>
+    <input type="number" min="1" max="10" id="quantidade" value="1">
+  </div>
+
+  <div class="grupo" id="acompanhamentos" style="display: none;">
+    <h3>Acompanhamentos</h3>
+  </div>
+
+  <button onclick="adicionarItens()">Adicionar à Sacola</button>
+  <button onclick="fecharPedido()">Fechar Pedido</button>
+  <button onclick="esvaziarSacola()">Esvaziar Sacola</button>
+
+  <div id="resumo">
+    <h3>Sacola de Compras:</h3>
+    <ul id="lista-sacola"></ul>
+  </div>
+
+  <div id="pedido-finalizado" style="display:none">
+    <h3>Pedido Finalizado:</h3>
+    <div id="detalhes-pedido"></div>
+    <button onclick="recomecarPedido()">Recomeçar</button>
+  </div>
+
+  <script>
+    const sacola = [];
+
+    const precos = {
+      'Açaí 300ml': 7,
+      'Açaí 400ml': 8,
+      'Açaí 500ml': 10,
+      'Açaí com Cupuaçu 300ml': 10,
+      'Açaí com Cupuaçu 400ml': 11,
+      'Açaí com Cupuaçu 500ml': 13,
+      'Cupuaçu 300ml': 10,
+      'Cupuaçu 400ml': 11,
+      'Cupuaçu 500ml': 13,
+      'Rubra': 13,
+      'Sicília': 13,
+      'Solis': 13,
+      'Ninho 400ml': 15,
+      'Ninho 500ml': 15,
+      'Belga': 15,
+      'Áurea': 14
+    };
+
+    const produtosComAcompanhamentos = [
+      'Açaí 300ml', 'Açaí 400ml', 'Açaí 500ml',
+      'Açaí com Cupuaçu 300ml', 'Açaí com Cupuaçu 400ml', 'Açaí com Cupuaçu 500ml',
+      'Cupuaçu 300ml', 'Cupuaçu 400ml', 'Cupuaçu 500ml',
+      'Ninho 400ml', 'Ninho 500ml'
+    ];
+
+    const produtos = Object.keys(precos);
+
+    const acompanhamentosLista = {
+      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate'],
+      "Farinhas": ['Leite', 'Paçoca', 'Granola'],
+      "Guloseimas": ['Confete', 'Chocoball', 'Jujuba'],
+      "Frutas": ['Banana', 'Uva', 'Morango (Fruta)'],
+      "Adicionais": ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
+    };
+
+
+    const produtosDiv = document.getElementById("produtos");
+    produtos.forEach(prod => {
+      const label = document.createElement("label");
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.name = "produto";
+      checkbox.value = prod;
+      checkbox.onclick = mostrarAcompanhamentos;
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(prod + " - R$ " + precos[prod].toFixed(2)));
+      produtosDiv.appendChild(label);
+      produtosDiv.appendChild(document.createElement("br"));
+    });
+
+    const acompDiv = document.getElementById("acompanhamentos");
+    for (const [categoria, lista] of Object.entries(acompanhamentosLista)) {
+      const titulo = document.createElement("h4");
+      titulo.textContent = categoria;
+      acompDiv.appendChild(titulo);
+
+      lista.forEach(acomp => {
+        const label = document.createElement("label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = "acompanhamento";
+        checkbox.value = acomp;
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(acomp));
+        acompDiv.appendChild(label);
+        acompDiv.appendChild(document.createElement("br"));
+      });
+
+      // Espaço visual entre categorias
+      acompDiv.appendChild(document.createElement("br"));
+    }
+
+
+    function mostrarAcompanhamentos() {
+      const selecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
+      const nomes = selecionados.map(p => p.value);
+      const deveMostrar = nomes.some(nome => produtosComAcompanhamentos.includes(nome));
+      document.getElementById("acompanhamentos").style.display = deveMostrar ? "block" : "none";
+    }
+
+    function adicionarItens() {
+      const produtosSelecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
+      const acompSelecionados = Array.from(document.querySelectorAll('input[name="acompanhamento"]:checked'));
+      const qtd = parseInt(document.getElementById("quantidade").value);
+
+      produtosSelecionados.forEach(p => {
+        sacola.push({
+          produto: p.value,
+          qtd: qtd,
+          preco: precos[p.value] * qtd,
+          acompanhamentos: produtosComAcompanhamentos.includes(p.value) ? acompSelecionados.map(a => a.value) : []
+        });
+      });
+
+      atualizarSacola();
+      limparCampos();
+    }
+
+    function atualizarSacola() {
+      const lista = document.getElementById("lista-sacola");
+      lista.innerHTML = "";
+      sacola.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = `${item.qtd}x ${item.produto} - R$ ${item.preco.toFixed(2)}`;
+        lista.appendChild(li);
+      });
+    }
+
+    function limparCampos() {
+      document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.getElementById("quantidade").value = 1;
+      document.getElementById("acompanhamentos").style.display = "none";
+    }
+
+    function fecharPedido() {
+      const container = document.getElementById("pedido-finalizado");
+      const detalhes = document.getElementById("detalhes-pedido");
+      detalhes.innerHTML = "";
+      if (sacola.length === 0) {
+        alert("Sua sacola está vazia.");
+        return;
+      }
+
+      sacola.forEach(item => {
+        const div = document.createElement("div");
+        div.innerHTML = `<strong>${item.qtd}x ${item.produto}</strong><br>`;
+
+        const categorias = {
+          Cobertura: ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate'],
+          Farinhas: ['Leite', 'Paçoca', 'Granola'],
+          Guloseimas: ['Confete', 'Chocoball', 'Jujuba'],
+          Frutas: ['Banana', 'Uva', 'Morango (Fruta)'],
+          Adicionais: ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
+        };
+
+        for (const [categoria, itens] of Object.entries(categorias)) {
+          const filtrados = item.acompanhamentos.filter(acomp => itens.includes(acomp));
+          if (filtrados.length > 0) {
+            div.innerHTML += `<strong>${categoria}:</strong> ${filtrados.join(", ")}<br>`;
+          }
+        }
+
+        div.innerHTML += '<br>';
+        detalhes.appendChild(div);
+      });
+
+      container.style.display = "block";
+
+      // Esconde os controles
+      document.getElementById("resumo").style.display = "none";
+      document.querySelector(".grupo").style.display = "none";
+      document.querySelector("button[onclick='adicionarItens()']").style.display = "none";
+      document.querySelector("button[onclick='fecharPedido()']").style.display = "none";
+      document.querySelector("button[onclick='esvaziarSacola()']").style.display = "none";
+
+      // Imprimir o resumo
+      window.print();
+    }
+
+    function recomecarPedido() {
+      sacola.length = 0;
+      atualizarSacola();
+      limparCampos();
+
+      // Mostra tudo de novo
+      document.getElementById("pedido-finalizado").style.display = "none";
+      document.getElementById("resumo").style.display = "block";
+      document.querySelector(".grupo").style.display = "block";
+      document.querySelector("button[onclick='adicionarItens()']").style.display = "inline-block";
+      document.querySelector("button[onclick='fecharPedido()']").style.display = "inline-block";
+      document.querySelector("button[onclick='esvaziarSacola()']").style.display = "inline-block";
+    }
+
+    function esvaziarSacola() {
+      if (confirm("Deseja realmente esvaziar a sacola?")) {
+        sacola.length = 0;
+        atualizarSacola();
+        document.getElementById("pedido-finalizado").style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
