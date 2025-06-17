@@ -29,19 +29,36 @@
       }
 
       #pedido-finalizado strong {
-        display: block;
-        margin-top: 0px;
         font-size: 1.3em;
+        line-height: 1.2;
+      }
+
+      .pedido-item strong:not(:first-child) { 
+          display: inline; 
+          font-size: 1em; 
+          font-weight: bold;
+          margin-top: 0.1em; 
+          margin-bottom: 0.1em;
+          line-height: 1.2;
       }
 
       .pedido-item {
-        margin-bottom: 0px;
-        line-height: 1.5;
+        margin-bottom: 0px; /* Já estava 0, o que é bom */
+        line-height: 1.2; /* Diminua o espaçamento entre linhas dentro de cada item */
+        padding-bottom: 0.5em; /* Um pequeno espaço entre os itens inteiros */
+        border-bottom: 1px dashed #ccc; /* Opcional: Adiciona uma linha tracejada para separar melhor */
       }
+
+      .pedido-item br {
+          display: block;
+          margin-top: 0.2em; /* Espaço pequeno antes da categoria */
+          line-height: 0; /* Para não adicionar altura extra */
+      }
+
 
       .pedido-logo {
         width: 75%;
-        margin-bottom: 20px;
+        margin-bottom: 5px;
       }
     }
 
