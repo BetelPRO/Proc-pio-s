@@ -101,6 +101,7 @@
     }
 
     input[type="number"],
+    input[type="text"], /* NOVO ESTILO PARA INPUT TEXTO */
     button {
       font-size: clamp(1rem, 4vw, 1.2rem);
       padding: 10px;
@@ -132,6 +133,12 @@
 
   <img src="procopios.png" alt="">
 
+    <div class="grupo">
+        <h3>Identificação do Cliente</h3>
+        <label for="nome-cliente">Nome do Cliente:</label>
+        <input type="text" id="nome-cliente" placeholder="Digite o nome do cliente" required>
+    </div>
+
   <div class="grupo">
     <h3>Nosso Cardápio</h3>
     <div id="produtos"></div>
@@ -161,13 +168,13 @@
   <script>
     const sacola = [];
 
-    // 1. Definição do Menu Categorizado (NOVA ESTRUTURA)
+    // Definição do Menu Categorizado
     const menuCategorizado = {
         "Tradicional": {
             'Açaí 300ml': 7,
             'Açaí 400ml': 8,
             'Açaí 500ml': 10,
-            'Açaí de 700ml': 15, // NOVO
+            'Açaí de 700ml': 15,
             'Açaí com Cupuaçu 300ml': 10,
             'Açaí com Cupuaçu 400ml': 11,
             'Açaí com Cupuaçu 500ml': 13,
@@ -177,8 +184,7 @@
         },
         "Açaí Premium": {
             'Rubra': 13,
-            'Rubra com Cupuaçu': 15, // NOVO
-            // 'Rubra Imperial', 'Sicília Régia' não mapeados por falta de preço inicial
+            'Rubra com Cupuaçu': 15,
             'Sicília': 13,
             'Solis': 13,
             'Áurea': 14,
@@ -186,15 +192,14 @@
             'Ninho 400ml': 15,
             'Ninho 500ml': 15
         },
-        // Mantenho a estrutura, mas sugiro renomear os produtos para evitar conflito se forem diferentes
         "Cupuaçu Premium": {
              'Rubra (Cupuaçu)': 13,
              'Belga (Cupuaçu)': 15
         },
-        "Mousse": {} // Vazio
+        "Mousse": {}
     };
 
-    // 2. Consolidação de Preços (Objeto plano para compatibilidade com o restante da lógica)
+    // Consolidação de Preços
     const precos = {};
     for (const categoria in menuCategorizado) {
         Object.assign(precos, menuCategorizado[categoria]);
@@ -213,26 +218,26 @@
     // Produtos que terão acompanhamentos estritamente específicos
     const produtosComAcompanhamentosEspecificos = {
         'Rubra': ['Leite Condensado', 'Morango (Fruta)'],
-        'Rubra com Cupuaçu': ['Leite Condensado', 'Morango (Fruta)'], // NOVO
-        'Rubra (Cupuaçu)': ['Leite Condensado', 'Morango (Fruta)'], // Da categoria Cupuaçu Premium
+        'Rubra com Cupuaçu': ['Leite Condensado', 'Morango (Fruta)'],
+        'Rubra (Cupuaçu)': ['Leite Condensado', 'Morango (Fruta)'],
         'Belga': ['Leite Condensado', 'Chocoball'],
-        'Belga (Cupuaçu)': ['Leite Condensado', 'Chocoball'], // Da categoria Cupuaçu Premium
+        'Belga (Cupuaçu)': ['Leite Condensado', 'Chocoball'],
         'Sicília': ['Leite Condensado', 'Uva'],
         'Áurea': ['Leite Condensado']
     };
 
-    // Acompanhamentos que estarão SEMPRE disponíveis (Universais + NOVO)
+    // Acompanhamentos que estarão SEMPRE disponíveis (Universais)
     const acompanhamentosUniversais = [
         'Leite Condensado',
         'Morango (Fruta)',
         'Uva',
-        'Calda de Chocolate', // NOVO UNIVERSAL
+        'Calda de Chocolate',
         'Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini'
     ];
 
-    // Acompanhamentos por categoria (Incluindo o NOVO)
+    // Acompanhamentos por categoria
     const acompanhamentosLista = {
-      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de Chocolate'], // NOVO NA LISTA
+      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de Chocolate'],
       "Farinhas": ['Leite', 'Paçoca', 'Granola'],
       "Guloseimas": ['Confete', 'Chocoball', 'Jujuba'],
       "Frutas": ['Banana', 'Uva', 'Morango (Fruta)'],
@@ -240,9 +245,9 @@
     };
 
     const produtosDiv = document.getElementById("produtos");
-    produtosDiv.innerHTML = ''; // Limpa a div para o novo preenchimento por categoria
+    produtosDiv.innerHTML = '';
 
-    // Refatoração do Loop de Exibição dos Produtos
+    // Loop de Exibição dos Produtos
     for (const [categoria, produtos] of Object.entries(menuCategorizado)) {
         if (Object.keys(produtos).length > 0) {
             const h4 = document.createElement("h4");
@@ -302,7 +307,7 @@
         let produtosEspecificosAtivos = produtosSelecionados.some(p => produtosComAcompanhamentosEspecificos[p.value]);
 
         if (produtosGeraisAtivos) {
-            // Se algum produto geral foi selecionado, mostra todos os acompanhamentos (exceto os que seriam só específicos)
+            // Se algum produto geral foi selecionado, mostra todos os acompanhamentos
             document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'block');
         } else if (produtosEspecificosAtivos) {
             // Se APENAS produtos específicos foram selecionados, mostramos os específicos + os universais
@@ -363,22 +368,16 @@
         let isSpecificProduct = produtosComAcompanhamentosEspecificos[p.value];
 
         if (isGeralProduct) {
-            // Se é um produto geral, todos os acompanhamentos marcados são válidos
             acompanhamentosFinaisParaEsteItem = acompSelecionados.map(a => a.value);
         } else if (isSpecificProduct) {
-            // Se é um produto específico, combinamos os acompanhamentos permitidos para ele
-            // com os acompanhamentos universais.
             const permitidosEspecificos = produtosComAcompanhamentosEspecificos[p.value];
             const todosAcompanhamentosPermitidos = new Set([...permitidosEspecificos, ...acompanhamentosUniversais]);
-
             acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => todosAcompanhamentosPermitidos.has(a.value)).map(a => a.value);
 
         } else {
-            // Fallback: permite apenas universais se não for nem Geral nem Específico (caso improvável no setup atual)
             acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => acompanhamentosUniversais.includes(a.value)).map(a => a.value);
         }
 
-        // Garante que não haja duplicatas nos acompanhamentos adicionados à sacola
         acompanhamentosFinaisParaEsteItem = [...new Set(acompanhamentosFinaisParaEsteItem)];
 
 
@@ -405,8 +404,14 @@
     }
 
     function limparCampos() {
+      // Limpa campos do produto/quantidade
       document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
       document.getElementById("quantidade").value = 1;
+
+      // Limpa campo do cliente
+      document.getElementById("nome-cliente").value = ""; // NOVO
+
+      // Esconde acompanhamentos
       document.getElementById("acompanhamentos").style.display = "none";
       document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
     }
@@ -416,6 +421,8 @@
         const detalhes = document.getElementById("detalhes-pedido");
         detalhes.innerHTML = "";
         document.getElementById("resumo").style.display = "none";
+        
+        const nomeCliente = document.getElementById("nome-cliente").value.trim(); // Captura o nome
 
         if (sacola.length === 0) {
             alert("Sua sacola está vazia.");
@@ -428,6 +435,12 @@
         logo.className = "pedido-logo";
         detalhes.appendChild(logo);
 
+        // NOVO: Adiciona o nome do cliente no topo do pedido
+        const clienteDiv = document.createElement("div");
+        clienteDiv.style.marginBottom = "1em";
+        clienteDiv.innerHTML = `<strong>CLIENTE:</strong> ${nomeCliente || 'Não Informado'}`; // Exibe o nome ou 'Não Informado'
+        detalhes.appendChild(clienteDiv);
+
         let total = 0;
 
         sacola.forEach(item => {
@@ -436,7 +449,6 @@
 
             div.innerHTML = `<strong>${item.qtd}x ${item.produto} • R$ ${item.preco.toFixed(2)}</strong>`;
 
-            // Categorias usadas no resumo (incluindo o novo item)
             const categorias = {
                 Coberturas: ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de Chocolate', 'Calda de morango'],
                 Farinhas: ['Leite', 'Paçoca', 'Granola'],
@@ -448,7 +460,6 @@
             for (const [categoria, itens] of Object.entries(categorias)) {
                 const filtrados = item.acompanhamentos.filter(a => itens.includes(a));
                 if (filtrados.length > 0) {
-                    // Aqui, adicionamos a quebra de linha e o negrito com o nome da categoria
                     div.innerHTML += `<br>${categoria}: <strong>${filtrados.join(", ")}</strong>`;
                 }
             }
