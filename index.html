@@ -83,12 +83,12 @@
       margin-top: 2em;
       font-size: clamp(1.4rem, 5vw, 2rem);
     }
-    /* Ajuste no h4 para as categorias de produto ficarem menos espaçadas que o h3 principal */
-    .grupo > h4 {
-        margin-top: 1em;
-        margin-bottom: 0.5em;
-        font-size: clamp(1.2rem, 4vw, 1.8rem);
-    }
+    /* Ajuste no h4 para as categorias de produto ficarem menos espaçadas que o h3 principal */
+    .grupo > h4 {
+        margin-top: 1em;
+        margin-bottom: 0.5em;
+        font-size: clamp(1.2rem, 4vw, 1.8rem);
+    }
 
     .grupo {
       margin-bottom: 2em;
@@ -101,7 +101,7 @@
     }
 
     input[type="number"],
-    input[type="text"], /* NOVO ESTILO PARA INPUT TEXTO */
+    input[type="text"],
     button {
       font-size: clamp(1rem, 4vw, 1.2rem);
       padding: 10px;
@@ -113,6 +113,13 @@
       margin-top: 1em;
       cursor: pointer;
     }
+    
+    /* NOVO ESTILO: Botão de confirmação de nome */
+    #botao-confirmar-nome {
+        margin-top: 0.5em; /* Menor margem */
+        background-color: #007bff; /* Azul para destaque */
+        color: white;
+    }
 
     ul {
       padding-left: 1em;
@@ -133,11 +140,12 @@
 
   <img src="procopios.png" alt="">
 
-    <div class="grupo">
-        <h3>Identificação do Cliente</h3>
-        <label for="nome-cliente">Nome do Cliente:</label>
-        <input type="text" id="nome-cliente" placeholder="Digite o nome do cliente" required>
-    </div>
+    <div class="grupo">
+        <h3>Identificação do Cliente</h3>
+        <label for="nome-cliente">Nome do Cliente:</label>
+        <input type="text" id="nome-cliente" placeholder="Digite o nome do cliente" required>
+        <button id="botao-confirmar-nome" onclick="confirmarNomeCliente()">Confirmar Nome</button>
+    </div>
 
   <div class="grupo">
     <h3>Comanda</h3>
@@ -167,330 +175,383 @@
 
   <script>
     const sacola = [];
+    let nomeClienteConfirmado = ""; // VARIÁVEL GLOBAL PARA ARMAZENAR O NOME CONFIRMADO
 
-    // Definição do Menu Categorizado
-    const menuCategorizado = {
-        "Tradicional": {
-            'Açaí 300ml': 8,
-            'Açaí 400ml': 10,
-            'Açaí 500ml': 12,
-            'Açaí com Cupuaçu 300ml': 11,
-            'Açaí com Cupuaçu 400ml': 13,
-            'Açaí com Cupuaçu 500ml': 15,
-            'Cupuaçu 300ml': 11,
-            'Cupuaçu 400ml': 13,
-            'Cupuaçu 500ml': 15
-        },
-        "Açaí Premium": {
-            'Rubra': 13,
-            'Rubra Imperial': 15,
-            'Sicília': 13,
-            'Sicília Régia': 14.50,
-            'Solis': 13,
-            'Áurea': 14,
-            'Belga': 15,
-            'Ninho 400ml': 15,
-            'Ninho 500ml': 17
-        },
-        "Cupuaçu Premium": {
-             'Rubra (Cupuaçu)': 17,
-             'Belga (Cupuaçu)': 19
-        },
-        "Mousse": {
-            'Rubra': 6,
-            'Sicília': 6,
-            'Solis': 6,
-            'Áurea': 7,
-            'Belga': 8,
-            'Ninho': 8
-        }
-    };
+    // Definição do Menu Categorizado
+    const menuCategorizado = {
+        "Tradicional": {
+            'Açaí 300ml': 8,
+            'Açaí 400ml': 10,
+            'Açaí 500ml': 12,
+            'Açaí com Cupuaçu 300ml': 11,
+            'Açaí com Cupuaçu 400ml': 13,
+            'Açaí com Cupuaçu 500ml': 15,
+            'Cupuaçu 300ml': 11,
+            'Cupuaçu 400ml': 13,
+            'Cupuaçu 500ml': 15
+        },
+        "Açaí Premium": {
+            'Rubra': 13,
+            'Rubra Imperial': 15,
+            'Sicília': 13,
+            'Sicília Régia': 14.50,
+            'Solis': 13,
+            'Áurea': 14,
+            'Belga': 15,
+            'Ninho 400ml': 15,
+            'Ninho 500ml': 17
+        },
+        "Cupuaçu Premium": {
+             'Rubra (Cupuaçu)': 17,
+             'Belga (Cupuaçu)': 19
+        },
+        "Mousse": {
+            'Rubra': 6,
+            'Sicília': 6,
+            'Solis': 6,
+            'Áurea': 7,
+            'Belga': 8,
+            'Ninho': 8
+        }
+    };
 
-    // Consolidação de Preços
-    const precos = {};
-    for (const categoria in menuCategorizado) {
-        Object.assign(precos, menuCategorizado[categoria]);
-    }
+    // Consolidação de Preços
+    const precos = {};
+    for (const categoria in menuCategorizado) {
+        Object.assign(precos, menuCategorizado[categoria]);
+    }
 
 
-    // Produtos que sempre mostram todos os acompanhamentos gerais
-    const produtosComAcompanhamentosGerais = [
-      'Açaí 300ml', 'Açaí 400ml', 'Açaí 500ml',
-      'Açaí com Cupuaçu 300ml', 'Açaí com Cupuaçu 400ml', 'Açaí com Cupuaçu 500ml',
-      'Cupuaçu 300ml', 'Cupuaçu 400ml', 'Cupuaçu 500ml',
-      'Ninho 400ml', 'Ninho 500ml'
-    ];
+    // Produtos que sempre mostram todos os acompanhamentos gerais
+    const produtosComAcompanhamentosGerais = [
+      'Açaí 300ml', 'Açaí 400ml', 'Açaí 500ml',
+      'Açaí com Cupuaçu 300ml', 'Açaí com Cupuaçu 400ml', 'Açaí com Cupuaçu 500ml',
+      'Cupuaçu 300ml', 'Cupuaçu 400ml', 'Cupuaçu 500ml',
+      'Ninho 400ml', 'Ninho 500ml',
+       // Adiciona 'Solis' aqui, pois não tem lógica específica na lista de específicos, mas é premium
+       'Solis'
+    ];
 
-    // Produtos que terão acompanhamentos estritamente específicos
-    const produtosComAcompanhamentosEspecificos = {
-        'Rubra': ['Leite Condensado', 'Morango (Fruta)'],
-        'Rubra (Cupuaçu)': ['Leite Condensado', 'Morango (Fruta)'],
-        'Belga': ['Leite Condensado', 'Chocoball'],
-        'Belga (Cupuaçu)': ['Leite Condensado', 'Chocoball'],
-        'Sicília Régia': ['Leite Condensado', 'Uva'],
-        
-        'Áurea': ['Leite Condensado']
-    };
+    // Produtos que terão acompanhamentos estritamente específicos
+    const produtosComAcompanhamentosEspecificos = {
+        'Rubra': ['Leite Condensado', 'Morango (Fruta)'],
+        'Rubra Imperial': ['Leite Condensado', 'Morango (Fruta)'], // Adicionando Imperial aqui
+        'Rubra (Cupuaçu)': ['Leite Condensado', 'Morango (Fruta)'],
+        'Belga': ['Leite Condensado', 'Chocoball'],
+        'Belga (Cupuaçu)': ['Leite Condensado', 'Chocoball'],
+        'Sicília Régia': ['Leite Condensado', 'Uva'],
+        'Sicília': ['Leite Condensado', 'Uva'], // Adicionando Sicília aqui
+        'Áurea': ['Leite Condensado'],
+        // 'Ninho' e variações de Mousse não precisam ser específicos se não tiverem regras extras
+    };
 
-    // Acompanhamentos que estarão SEMPRE disponíveis (Universais)
-    const acompanhamentosUniversais = [
-        'Leite Condensado',
-        'Morango (Fruta)',
-        'Uva',
-        'Calda de Chocolate',
-        'Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini'
-    ];
+    // Acompanhamentos que estarão SEMPRE disponíveis (Universais)
+    const acompanhamentosUniversais = [
+        'Leite Condensado',
+        'Morango (Fruta)',
+        'Uva',
+        'Calda de Chocolate',
+        'Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini'
+    ];
 
-    // Acompanhamentos por categoria
-    const acompanhamentosLista = {
-      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de Chocolate'],
-      "Farinhas": ['Leite', 'Paçoca', 'Granola'],
-      "Guloseimas": ['Confete', 'Chocoball', 'Jujuba'],
-      "Frutas": ['Banana', 'Uva', 'Morango (Fruta)'],
-      "Adicionais": ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
-    };
+    // Acompanhamentos por categoria
+    const acompanhamentosLista = {
+      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de Chocolate'],
+      "Farinhas": ['Leite', 'Paçoca', 'Granola'],
+      "Guloseimas": ['Confete', 'Chocoball', 'Jujuba'],
+      "Frutas": ['Banana', 'Uva', 'Morango (Fruta)'],
+      "Adicionais": ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
+    };
 
-    const produtosDiv = document.getElementById("produtos");
-    produtosDiv.innerHTML = '';
+    const produtosDiv = document.getElementById("produtos");
+    produtosDiv.innerHTML = '';
 
-    // Loop de Exibição dos Produtos
-    for (const [categoria, produtos] of Object.entries(menuCategorizado)) {
-        if (Object.keys(produtos).length > 0) {
-            const h4 = document.createElement("h4");
-            h4.textContent = categoria;
-            produtosDiv.appendChild(h4);
+    // Loop de Exibição dos Produtos
+    for (const [categoria, produtos] of Object.entries(menuCategorizado)) {
+        if (Object.keys(produtos).length > 0) {
+            const h4 = document.createElement("h4");
+            h4.textContent = categoria;
+            produtosDiv.appendChild(h4);
 
-            for (const [prod, preco] of Object.entries(produtos)) {
-                const label = document.createElement("label");
-                const checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.name = "produto";
-                checkbox.value = prod;
-                checkbox.onclick = mostrarAcompanhamentos;
-                label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(prod + " - R$ " + preco.toFixed(2)));
-                produtosDiv.appendChild(label);
-            }
-        }
-    }
+            for (const [prod, preco] of Object.entries(produtos)) {
+                const label = document.createElement("label");
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.name = "produto";
+                checkbox.value = prod;
+                checkbox.onclick = mostrarAcompanhamentos;
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(prod + " - R$ " + preco.toFixed(2)));
+                produtosDiv.appendChild(label);
+            }
+        }
+    }
 
-    const acompDiv = document.getElementById("acompanhamentos");
-    // Preenche a div de acompanhamentos
-    for (const [categoria, itens] of Object.entries(acompanhamentosLista)) {
-        const h4 = document.createElement("h4");
-        h4.textContent = categoria;
-        h4.className = 'acomp-categoria';
-        acompDiv.appendChild(h4);
-        itens.forEach(acomp => {
-            const label = document.createElement("label");
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.name = "acompanhamento";
-            checkbox.value = acomp;
-            label.appendChild(checkbox);
-            label.appendChild(document.createTextNode(acomp));
-            label.className = 'acomp-item-label';
-            acompDiv.appendChild(label);
-        });
-    }
+    const acompDiv = document.getElementById("acompanhamentos");
+    // Preenche a div de acompanhamentos
+    for (const [categoria, itens] of Object.entries(acompanhamentosLista)) {
+        const h4 = document.createElement("h4");
+        h4.textContent = categoria;
+        h4.className = 'acomp-categoria';
+        acompDiv.appendChild(h4);
+        itens.forEach(acomp => {
+            const label = document.createElement("label");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.name = "acompanhamento";
+            checkbox.value = acomp;
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(acomp));
+            label.className = 'acomp-item-label';
+            acompDiv.appendChild(label);
+        });
+    }
 
-    function mostrarAcompanhamentos() {
-        const produtosSelecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
-        const acompDiv = document.getElementById("acompanhamentos");
+    // NOVA FUNÇÃO: Confirma e salva o nome do cliente
+    function confirmarNomeCliente() {
+        const inputNome = document.getElementById("nome-cliente");
+        const botaoConfirmar = document.getElementById("botao-confirmar-nome");
+        const nome = inputNome.value.trim();
 
-        // Esconde todos os acompanhamentos e suas categorias primeiro
-        document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('input[name="acompanhamento"]').forEach(cb => cb.checked = false); // Desmarca tudo
-
-        if (produtosSelecionados.length === 0) {
-            acompDiv.style.display = "none";
+        if (nome === "") {
+            alert("Por favor, digite o nome do cliente.");
             return;
         }
 
-        acompDiv.style.display = "block"; // Garante que a div principal de acompanhamentos esteja visível
-
-        let produtosGeraisAtivos = produtosSelecionados.some(p => produtosComAcompanhamentosGerais.includes(p.value));
-        let produtosEspecificosAtivos = produtosSelecionados.some(p => produtosComAcompanhamentosEspecificos[p.value]);
-
-        if (produtosGeraisAtivos) {
-            // Se algum produto geral foi selecionado, mostra todos os acompanhamentos
-            document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'block');
-        } else if (produtosEspecificosAtivos) {
-            // Se APENAS produtos específicos foram selecionados, mostramos os específicos + os universais
-            let acompanhamentosParaExibir = new Set(acompanhamentosUniversais); // Começa com os universais
-
-            produtosSelecionados.forEach(prodSelecionado => {
-                const especificosDoProd = produtosComAcompanhamentosEspecificos[prodSelecionado.value];
-                if (especificosDoProd) {
-                    especificosDoProd.forEach(acomp => acompanhamentosParaExibir.add(acomp));
-                }
-            });
-
-            // Itera sobre todos os labels e mostra apenas os relevantes
-            document.querySelectorAll('.acomp-item-label').forEach(label => {
-                const checkbox = label.querySelector('input[type="checkbox"]');
-                if (acompanhamentosParaExibir.has(checkbox.value)) {
-                    label.style.display = 'block'; // Mostra o checkbox
-
-                    // Encontra e mostra a categoria pai desse acompanhamento
-                    for (const [catNome, itensDaCategoria] of Object.entries(acompanhamentosLista)) {
-                        if (itensDaCategoria.includes(checkbox.value)) {
-                            const categoriaH4 = Array.from(document.querySelectorAll('.acomp-categoria')).find(h4 => h4.textContent === catNome);
-                            if (categoriaH4) {
-                                categoriaH4.style.display = 'block'; // Mostra a categoria
-                            }
-                            break;
-                        }
-                    }
-                }
-            });
-        } else {
-            // Nenhum produto selecionado que precise de acompanhamento
-            acompDiv.style.display = "none";
-        }
-
-        // Garante que a seção de acompanhamentos apareça na tela, se estiver visível
-        if (acompDiv.style.display === "block") {
-            setTimeout(() => {
-                acompDiv.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 200);
-        }
+        nomeClienteConfirmado = nome; // Armazena o nome na variável global
+        inputNome.disabled = true; // Desabilita o campo
+        botaoConfirmar.disabled = true; // Desabilita o botão
+        botaoConfirmar.textContent = `Nome Confirmado: ${nome}`;
+        botaoConfirmar.style.backgroundColor = '#4CAF50'; // Muda para verde
+        
+        // Não é estritamente necessário, mas ajuda o usuário:
+        // alert(`Nome do cliente (${nome}) confirmado! Pode prosseguir com o pedido.`);
     }
 
 
-    function adicionarItens() {
-      const produtosSelecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
-      const acompSelecionados = Array.from(document.querySelectorAll('input[name="acompanhamento"]:checked'));
-      const qtd = parseInt(document.getElementById("quantidade").value);
+    function mostrarAcompanhamentos() {
+        const produtosSelecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
+        const acompDiv = document.getElementById("acompanhamentos");
 
-      if (produtosSelecionados.length === 0) {
-        alert("Por favor, selecione ao menos um produto.");
+        // Esconde todos os acompanhamentos e suas categorias primeiro
+        document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('input[name="acompanhamento"]').forEach(cb => cb.checked = false); // Desmarca tudo
+
+        if (produtosSelecionados.length === 0) {
+            acompDiv.style.display = "none";
+            return;
+        }
+
+        acompDiv.style.display = "block"; // Garante que a div principal de acompanhamentos esteja visível
+
+        let produtosGeraisAtivos = produtosSelecionados.some(p => produtosComAcompanhamentosGerais.includes(p.value));
+        let produtosEspecificosAtivos = produtosSelecionados.some(p => produtosComAcompanhamentosEspecificos[p.value]);
+
+        if (produtosGeraisAtivos) {
+            // Se algum produto geral foi selecionado, mostra todos os acompanhamentos
+            document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'block');
+        } else if (produtosEspecificosAtivos) {
+            // Se APENAS produtos específicos foram selecionados, mostramos os específicos + os universais
+            let acompanhamentosParaExibir = new Set(acompanhamentosUniversais); // Começa com os universais
+
+            produtosSelecionados.forEach(prodSelecionado => {
+                const especificosDoProd = produtosComAcompanhamentosEspecificos[prodSelecionado.value];
+                if (especificosDoProd) {
+                    especificosDoProd.forEach(acomp => acompanhamentosParaExibir.add(acomp));
+                }
+            });
+
+            // Itera sobre todos os labels e mostra apenas os relevantes
+            document.querySelectorAll('.acomp-item-label').forEach(label => {
+                const checkbox = label.querySelector('input[type="checkbox"]');
+                if (acompanhamentosParaExibir.has(checkbox.value)) {
+                    label.style.display = 'block'; // Mostra o checkbox
+
+                    // Encontra e mostra a categoria pai desse acompanhamento
+                    for (const [catNome, itensDaCategoria] of Object.entries(acompanhamentosLista)) {
+                        if (itensDaCategoria.includes(checkbox.value)) {
+                            const categoriaH4 = Array.from(document.querySelectorAll('.acomp-categoria')).find(h4 => h4.textContent === catNome);
+                            if (categoriaH4) {
+                                categoriaH4.style.display = 'block'; // Mostra a categoria
+                            }
+                            break;
+                        }
+                    }
+                }
+            });
+        } else {
+            // Nenhum produto selecionado que precise de acompanhamento
+            acompDiv.style.display = "none";
+        }
+
+        // Garante que a seção de acompanhamentos apareça na tela, se estiver visível
+        if (acompDiv.style.display === "block") {
+            setTimeout(() => {
+                acompDiv.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 200);
+        }
+    }
+
+
+    function adicionarItens() {
+      if (nomeClienteConfirmado === "") { // REFORÇA A NECESSIDADE DE CONFIRMAÇÃO DO NOME
+        alert("Por favor, confirme o nome do cliente antes de adicionar itens à sacola.");
         return;
       }
+      
+      const produtosSelecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
+      const acompSelecionados = Array.from(document.querySelectorAll('input[name="acompanhamento"]:checked'));
+      const qtd = parseInt(document.getElementById("quantidade").value);
 
-      produtosSelecionados.forEach(p => {
-        let acompanhamentosFinaisParaEsteItem = [];
-        let isGeralProduct = produtosComAcompanhamentosGerais.includes(p.value);
-        let isSpecificProduct = produtosComAcompanhamentosEspecificos[p.value];
+      if (produtosSelecionados.length === 0) {
+        alert("Por favor, selecione ao menos um produto.");
+        return;
+      }
 
-        if (isGeralProduct) {
-            acompanhamentosFinaisParaEsteItem = acompSelecionados.map(a => a.value);
-        } else if (isSpecificProduct) {
-            const permitidosEspecificos = produtosComAcompanhamentosEspecificos[p.value];
-            const todosAcompanhamentosPermitidos = new Set([...permitidosEspecificos, ...acompanhamentosUniversais]);
-            acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => todosAcompanhamentosPermitidos.has(a.value)).map(a => a.value);
+      produtosSelecionados.forEach(p => {
+        let acompanhamentosFinaisParaEsteItem = [];
+        let isGeralProduct = produtosComAcompanhamentosGerais.includes(p.value);
+        let isSpecificProduct = produtosComAcompanhamentosEspecificos[p.value];
 
-        } else {
-            acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => acompanhamentosUniversais.includes(a.value)).map(a => a.value);
-        }
+        if (isGeralProduct) {
+            acompanhamentosFinaisParaEsteItem = acompSelecionados.map(a => a.value);
+        } else if (isSpecificProduct) {
+            const permitidosEspecificos = produtosComAcompanhamentosEspecificos[p.value];
+            const todosAcompanhamentosPermitidos = new Set([...permitidosEspecificos, ...acompanhamentosUniversais]);
+            acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => todosAcompanhamentosPermitidos.has(a.value)).map(a => a.value);
 
-        acompanhamentosFinaisParaEsteItem = [...new Set(acompanhamentosFinaisParaEsteItem)];
+        } else {
+            acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => acompanhamentosUniversais.includes(a.value)).map(a => a.value);
+        }
+
+        acompanhamentosFinaisParaEsteItem = [...new Set(acompanhamentosFinaisParaEsteItem)];
 
 
-        sacola.push({
-          produto: p.value,
-          qtd: qtd,
-          preco: precos[p.value] * qtd,
-          acompanhamentos: acompanhamentosFinaisParaEsteItem
-        });
-      });
+        sacola.push({
+          produto: p.value,
+          qtd: qtd,
+          preco: precos[p.value] * qtd,
+          acompanhamentos: acompanhamentosFinaisParaEsteItem
+        });
+      });
 
-      atualizarSacola();
-      limparCampos();
+      atualizarSacola();
+      // Usa função auxiliar para limpar apenas itens de produto
+      limparCamposProdutos(); 
+    }
+
+    function atualizarSacola() {
+      const lista = document.getElementById("lista-sacola");
+      lista.innerHTML = "";
+      sacola.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = `${item.qtd}x ${item.produto} - R$ ${item.preco.toFixed(2)}`;
+        lista.appendChild(li);
+      });
+    }
+    
+    // Funcao auxiliar para limpar apenas a selecao de produtos
+    function limparCamposProdutos() {
+        document.querySelectorAll('input[name="produto"]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('input[name="acompanhamento"]').forEach(cb => cb.checked = false);
+        document.getElementById("quantidade").value = 1;
+        document.getElementById("acompanhamentos").style.display = "none";
+        document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
     }
 
-    function atualizarSacola() {
-      const lista = document.getElementById("lista-sacola");
-      lista.innerHTML = "";
-      sacola.forEach((item) => {
-        const li = document.createElement("li");
-        li.textContent = `${item.qtd}x ${item.produto} - R$ ${item.preco.toFixed(2)}`;
-        lista.appendChild(li);
-      });
-    }
+    // Função que limpa tudo, incluindo o nome e reabilita o campo
+    function limparCampos() {
+      // Limpa campos de produto
+      limparCamposProdutos();
 
-    function limparCampos() {
-      // Limpa campos do produto/quantidade
-      document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-      document.getElementById("quantidade").value = 1;
+      // Limpa e reabilita o campo do cliente
+      const inputNome = document.getElementById("nome-cliente");
+      const botaoConfirmar = document.getElementById("botao-confirmar-nome");
 
-      // Limpa campo do cliente
-      document.getElementById("nome-cliente").value = ""; // NOVO
+      inputNome.value = "";
+      inputNome.disabled = false; // Reabilita
+      botaoConfirmar.disabled = false; // Reabilita
+      botaoConfirmar.textContent = "Confirmar Nome";
+      botaoConfirmar.style.backgroundColor = '#007bff'; // Volta a cor
+      nomeClienteConfirmado = ""; // Limpa a variável global
+    }
 
-      // Esconde acompanhamentos
-      document.getElementById("acompanhamentos").style.display = "none";
-      document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
-    }
+    function fecharPedido() {
+        const container = document.getElementById("pedido-finalizado");
+        const detalhes = document.getElementById("detalhes-pedido");
+        detalhes.innerHTML = "";
+        document.getElementById("resumo").style.display = "none";
+        
+        // Usa o nome CONFIRMADO (variável global)
+        const nomeCliente = nomeClienteConfirmado.trim();
 
-    function fecharPedido() {
-        const container = document.getElementById("pedido-finalizado");
-        const detalhes = document.getElementById("detalhes-pedido");
-        detalhes.innerHTML = "";
-        document.getElementById("resumo").style.display = "none";
-        
-        const nomeCliente = document.getElementById("nome-cliente").value.trim(); // Captura o nome
+        if (sacola.length === 0) {
+            alert("Sua sacola está vazia.");
+            return;
+        }
+      
+      if (nomeCliente === "") { // Revalidação do nome, caso tenham pulado a confirmação e adicionado itens
+          alert("O nome do cliente não foi confirmado. Por favor, confirme o nome para fechar o pedido.");
+          document.getElementById("resumo").style.display = "block"; // Volta para o resumo
+          return;
+      }
 
-        if (sacola.length === 0) {
-            alert("Sua sacola está vazia.");
-            return;
-        }
+        const logo = document.createElement("img");
+        logo.src = "procopios.png";
+        logo.alt = "Procópio’s Açaí";
+        logo.className = "pedido-logo";
+        detalhes.appendChild(logo);
 
-        const logo = document.createElement("img");
-        logo.src = "procopios.png";
-        logo.alt = "Procópio’s Açaí";
-        logo.className = "pedido-logo";
-        detalhes.appendChild(logo);
+        // Adiciona o nome do cliente CONFIRMADO no topo do pedido
+        const clienteDiv = document.createElement("div");
+        clienteDiv.style.marginBottom = "1em";
+        clienteDiv.innerHTML = `<strong>CLIENTE:</strong> ${nomeCliente}`;
+        detalhes.appendChild(clienteDiv);
 
-        // NOVO: Adiciona o nome do cliente no topo do pedido
-        const clienteDiv = document.createElement("div");
-        clienteDiv.style.marginBottom = "1em";
-        clienteDiv.innerHTML = `<strong>CLIENTE:</strong> ${nomeCliente || 'Não Informado'}`; // Exibe o nome ou 'Não Informado'
-        detalhes.appendChild(clienteDiv);
+        let total = 0;
 
-        let total = 0;
+        sacola.forEach(item => {
+            const div = document.createElement("div");
+            div.className = "pedido-item";
 
-        sacola.forEach(item => {
-            const div = document.createElement("div");
-            div.className = "pedido-item";
+            div.innerHTML = `<strong>${item.qtd}x ${item.produto} • R$ ${item.preco.toFixed(2)}</strong>`;
 
-            div.innerHTML = `<strong>${item.qtd}x ${item.produto} • R$ ${item.preco.toFixed(2)}</strong>`;
+            const categorias = {
+                Coberturas: ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de Chocolate', 'Calda de morango'],
+                Farinhas: ['Leite', 'Paçoca', 'Granola'],
+                Guloseimas: ['Confete', 'Chocoball', 'Jujuba'],
+                Frutas: ['Banana', 'Uva', 'Morango (Fruta)', 'Morango'],
+                Adicionais: ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
+            };
 
-            const categorias = {
-                Coberturas: ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de Chocolate', 'Calda de morango'],
-                Farinhas: ['Leite', 'Paçoca', 'Granola'],
-                Guloseimas: ['Confete', 'Chocoball', 'Jujuba'],
-                Frutas: ['Banana', 'Uva', 'Morango (Fruta)', 'Morango'],
-                Adicionais: ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
-            };
+            for (const [categoria, itens] of Object.entries(categorias)) {
+                const filtrados = item.acompanhamentos.filter(a => itens.includes(a));
+                if (filtrados.length > 0) {
+                    div.innerHTML += `<br>${categoria}: <strong>${filtrados.join(", ")}</strong>`;
+                }
+            }
 
-            for (const [categoria, itens] of Object.entries(categorias)) {
-                const filtrados = item.acompanhamentos.filter(a => itens.includes(a));
-                if (filtrados.length > 0) {
-                    div.innerHTML += `<br>${categoria}: <strong>${filtrados.join(", ")}</strong>`;
-                }
-            }
+            detalhes.appendChild(div);
+            total += item.preco;
+        });
 
-            detalhes.appendChild(div);
-            total += item.preco;
-        });
+        const totalDiv = document.createElement("div");
+        totalDiv.innerHTML = `<strong>Total do pedido:</strong> R$ ${total.toFixed(2)}`;
+        detalhes.appendChild(totalDiv);
 
-        const totalDiv = document.createElement("div");
-        totalDiv.innerHTML = `<strong>Total do pedido:</strong> R$ ${total.toFixed(2)}`;
-        detalhes.appendChild(totalDiv);
+        container.style.display = "block";
 
-        container.style.display = "block";
+        window.print();
+    }
 
-        window.print();
-    }
-
-    function recomecar() {
-      sacola.length = 0;
-      document.getElementById("lista-sacola").innerHTML = "";
-      document.getElementById("detalhes-pedido").innerHTML = "";
-      document.getElementById("pedido-finalizado").style.display = "none";
-      document.getElementById("resumo").style.display = "block";
-      limparCampos();
-    }
+    function recomecar() {
+      sacola.length = 0;
+      document.getElementById("lista-sacola").innerHTML = "";
+      document.getElementById("detalhes-pedido").innerHTML = "";
+      document.getElementById("pedido-finalizado").style.display = "none";
+      document.getElementById("resumo").style.display = "block";
+      limparCampos(); // Limpa tudo
+    }
 </script>
 </body>
 </html>
