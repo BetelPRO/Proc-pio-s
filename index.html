@@ -171,32 +171,39 @@
     // Definição do Menu Categorizado
     const menuCategorizado = {
         "Tradicional": {
-            'Açaí 300ml': 7,
-            'Açaí 400ml': 8,
-            'Açaí 500ml': 10,
-            'Açaí de 700ml': 15,
-            'Açaí com Cupuaçu 300ml': 10,
-            'Açaí com Cupuaçu 400ml': 11,
-            'Açaí com Cupuaçu 500ml': 13,
-            'Cupuaçu 300ml': 10,
-            'Cupuaçu 400ml': 11,
-            'Cupuaçu 500ml': 13
+            'Açaí 300ml': 8,
+            'Açaí 400ml': 10,
+            'Açaí 500ml': 12,
+            'Açaí com Cupuaçu 300ml': 11,
+            'Açaí com Cupuaçu 400ml': 13,
+            'Açaí com Cupuaçu 500ml': 15,
+            'Cupuaçu 300ml': 11,
+            'Cupuaçu 400ml': 13,
+            'Cupuaçu 500ml': 15
         },
         "Açaí Premium": {
             'Rubra': 13,
-            'Rubra com Cupuaçu': 15,
+            'Rubra Imperial': 15,
             'Sicília': 13,
+            'Sicília Régia': 14.50,
             'Solis': 13,
             'Áurea': 14,
             'Belga': 15,
             'Ninho 400ml': 15,
-            'Ninho 500ml': 15
+            'Ninho 500ml': 17
         },
         "Cupuaçu Premium": {
-             'Rubra (Cupuaçu)': 13,
-             'Belga (Cupuaçu)': 15
+             'Rubra (Cupuaçu)': 17,
+             'Belga (Cupuaçu)': 19
         },
-        "Mousse": {}
+        "Mousse": {
+            'Rubra': 6,
+            'Sicília': 6,
+            'Solis': 6,
+            'Áurea': 7,
+            'Belga': 8,
+            'Ninho': 8
+        }
     };
 
     // Consolidação de Preços
@@ -208,21 +215,20 @@
 
     // Produtos que sempre mostram todos os acompanhamentos gerais
     const produtosComAcompanhamentosGerais = [
-      'Açaí 300ml', 'Açaí 400ml', 'Açaí 500ml', 'Açaí de 700ml',
+      'Açaí 300ml', 'Açaí 400ml', 'Açaí 500ml',
       'Açaí com Cupuaçu 300ml', 'Açaí com Cupuaçu 400ml', 'Açaí com Cupuaçu 500ml',
       'Cupuaçu 300ml', 'Cupuaçu 400ml', 'Cupuaçu 500ml',
-      'Ninho 400ml', 'Ninho 500ml',
-      'Solis'
+      'Ninho 400ml', 'Ninho 500ml'
     ];
 
     // Produtos que terão acompanhamentos estritamente específicos
     const produtosComAcompanhamentosEspecificos = {
         'Rubra': ['Leite Condensado', 'Morango (Fruta)'],
-        'Rubra com Cupuaçu': ['Leite Condensado', 'Morango (Fruta)'],
         'Rubra (Cupuaçu)': ['Leite Condensado', 'Morango (Fruta)'],
         'Belga': ['Leite Condensado', 'Chocoball'],
         'Belga (Cupuaçu)': ['Leite Condensado', 'Chocoball'],
-        'Sicília': ['Leite Condensado', 'Uva'],
+        'Sicília Régia': ['Leite Condensado', 'Uva'],
+        
         'Áurea': ['Leite Condensado']
     };
 
