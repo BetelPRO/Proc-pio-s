@@ -10,10 +10,12 @@
         visibility: hidden;
       }
 
+      /* Garante que o botão de recomeçar da tela final e o título "Pedido Finalizado" sejam ocultos na impressão */
       #botao-recomecar, #pedidoF {
         display: none !important;
       }
 
+      /* Torna visível SOMENTE o conteúdo da impressão (o logo, nome e detalhes) */
       #pedido-finalizado, #pedido-finalizado * {
         visibility: visible;
       }
@@ -113,11 +115,10 @@
       margin-top: 1em;
       cursor: pointer;
     }
-    
-    /* NOVO ESTILO: Botão de confirmação de nome */
+
     #botao-confirmar-nome {
-        margin-top: 0.5em; /* Menor margem */
-        background-color: #007bff; /* Azul para destaque */
+        margin-top: 0.5em;
+        background-color: #007bff;
         color: white;
     }
 
@@ -228,21 +229,19 @@
       'Açaí com Cupuaçu 300ml', 'Açaí com Cupuaçu 400ml', 'Açaí com Cupuaçu 500ml',
       'Cupuaçu 300ml', 'Cupuaçu 400ml', 'Cupuaçu 500ml',
       'Ninho 400ml', 'Ninho 500ml',
-       // Adiciona 'Solis' aqui, pois não tem lógica específica na lista de específicos, mas é premium
        'Solis'
     ];
 
     // Produtos que terão acompanhamentos estritamente específicos
     const produtosComAcompanhamentosEspecificos = {
         'Rubra': ['Leite Condensado', 'Morango (Fruta)'],
-        'Rubra Imperial': ['Leite Condensado', 'Morango (Fruta)'], // Adicionando Imperial aqui
+        'Rubra Imperial': ['Leite Condensado', 'Morango (Fruta)'],
         'Rubra (Cupuaçu)': ['Leite Condensado', 'Morango (Fruta)'],
         'Belga': ['Leite Condensado', 'Chocoball'],
         'Belga (Cupuaçu)': ['Leite Condensado', 'Chocoball'],
         'Sicília Régia': ['Leite Condensado', 'Uva'],
-        'Sicília': ['Leite Condensado', 'Uva'], // Adicionando Sicília aqui
+        'Sicília': ['Leite Condensado', 'Uva'],
         'Áurea': ['Leite Condensado'],
-        // 'Ninho' e variações de Mousse não precisam ser específicos se não tiverem regras extras
     };
 
     // Acompanhamentos que estarão SEMPRE disponíveis (Universais)
@@ -323,9 +322,6 @@
         botaoConfirmar.disabled = true; // Desabilita o botão
         botaoConfirmar.textContent = `Nome Confirmado: ${nome}`;
         botaoConfirmar.style.backgroundColor = '#4CAF50'; // Muda para verde
-        
-        // Não é estritamente necessário, mas ajuda o usuário:
-        // alert(`Nome do cliente (${nome}) confirmado! Pode prosseguir com o pedido.`);
     }
 
 
@@ -490,7 +486,7 @@
             return;
         }
       
-      if (nomeCliente === "") { // Revalidação do nome, caso tenham pulado a confirmação e adicionado itens
+      if (nomeCliente === "") { 
           alert("O nome do cliente não foi confirmado. Por favor, confirme o nome para fechar o pedido.");
           document.getElementById("resumo").style.display = "block"; // Volta para o resumo
           return;
