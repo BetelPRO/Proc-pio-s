@@ -10,7 +10,7 @@
         visibility: hidden;
       }
 
-      /* Garante que o botão de recomeçar da tela final e o título "Pedido Finalizado" sejam ocultos na impressão */
+      /* Oculta o botão de recomeçar da tela final e o título "Pedido Finalizado" (se necessário) */
       #botao-recomecar, #pedidoF {
         display: none !important;
       }
@@ -139,29 +139,25 @@
 </head>
 <body>
 
-  <img src="procopios.png" alt="">
-
-    <div class="grupo">
-        <h3>Identificação do Cliente</h3>
+  <img id="logo-principal" src="procopios.png" alt="">     <div id="identificacao-cliente" class="grupo">         <h3>Identificação do Cliente</h3>
         <label for="nome-cliente">Nome do Cliente:</label>
         <input type="text" id="nome-cliente" placeholder="Digite o nome do cliente" required>
         <button id="botao-confirmar-nome" onclick="confirmarNomeCliente()">Confirmar Nome</button>
     </div>
 
-  <div class="grupo">
-    <h3>Comanda</h3>
+  <div id="comanda" class="grupo">     <h3>Comanda</h3>
     <div id="produtos"></div>
     <label for="quantidade">Quantidade:</label>
     <input type="number" min="1" max="10" id="quantidade" value="1">
   </div>
 
-  <div class="grupo" id="acompanhamentos" style="display: none;">
+  <div id="acompanhamentos" class="grupo" style="display: none;">
     <h3>Acompanhamentos</h3>
   </div>
 
-  <button onclick="adicionarItens()">Adicionar à Sacola</button>
-  <button onclick="fecharPedido()">Fechar Pedido</button>
-  <button onclick="recomecar()">Recomeçar</button>
+  <button id="btn-adicionar" onclick="adicionarItens()">Adicionar à Sacola</button>
+  <button id="btn-fechar" onclick="fecharPedido()">Fechar Pedido</button>
+  <button id="btn-recomecar-pedido" onclick="recomecar()">Recomeçar</button>
 
   <div id="resumo" class="grupo">
     <h3>Sacola de Compras:</h3>
@@ -470,15 +466,22 @@
       botaoConfirmar.textContent = "Confirmar Nome";
       botaoConfirmar.style.backgroundColor = '#007bff'; // Volta a cor
       nomeClienteConfirmado = ""; // Limpa a variável global
+      
+      // REEXIBE OS ELEMENTOS ESCONDIDOS PELO fecharPedido()
+      document.getElementById('logo-principal').style.display = 'block'; 
+      document.getElementById('identificacao-cliente').style.display = 'block'; 
+      document.getElementById('comanda').style.display = 'block'; 
+      document.getElementById('btn-adicionar').style.display = 'block'; 
+      document.getElementById('btn-fechar').style.display = 'block'; 
+      document.getElementById('btn-recomecar-pedido').style.display = 'block'; 
+      document.getElementById("resumo").style.display = "block";
     }
 
     function fecharPedido() {
         const container = document.getElementById("pedido-finalizado");
         const detalhes = document.getElementById("detalhes-pedido");
         detalhes.innerHTML = "";
-        document.getElementById("resumo").style.display = "none";
-        
-        // Usa o nome CONFIRMADO (variável global)
+        
         const nomeCliente = nomeClienteConfirmado.trim();
 
         if (sacola.length === 0) {
@@ -488,9 +491,21 @@
       
       if (nomeCliente === "") { 
           alert("O nome do cliente não foi confirmado. Por favor, confirme o nome para fechar o pedido.");
-          document.getElementById("resumo").style.display = "block"; // Volta para o resumo
+          document.getElementById("resumo").style.display = "block";
           return;
       }
+      
+      // NOVO: OCULTA TODOS OS ELEMENTOS DA INTERFACE DE PEDIDOS
+      document.getElementById('logo-principal').style.display = 'none'; 
+      document.getElementById('identificacao-cliente').style.display = 'none'; 
+      document.getElementById('comanda').style.display = 'none'; 
+      document.getElementById('acompanhamentos').style.display = 'none'; 
+      document.getElementById('btn-adicionar').style.display = 'none'; 
+      document.getElementById('btn-fechar').style.display = 'none'; 
+      document.getElementById('btn-recomecar-pedido').style.display = 'none'; 
+      document.getElementById("resumo").style.display = "none";
+      // FIM: OCULTAÇÃO FORÇADA DE INTERFACE
+
 
         const logo = document.createElement("img");
         logo.src = "procopios.png";
@@ -507,6 +522,7 @@
         let total = 0;
 
         sacola.forEach(item => {
+            /* ... Lógica de formatação de itens da sacola ... */
             const div = document.createElement("div");
             div.className = "pedido-item";
 
@@ -535,9 +551,12 @@
         totalDiv.innerHTML = `<strong>Total do pedido:</strong> R$ ${total.toFixed(2)}`;
         detalhes.appendChild(totalDiv);
 
-        container.style.display = "block";
-
+        container.style.display = "block"; // Exibe a área de impressão
+        
         window.print();
+
+        // IMPORTANTE: Não é necessário reexibir aqui, pois a função `recomecar` fará isso.
+        // O usuário verá apenas o recibo até clicar em Recomeçar.
     }
 
     function recomecar() {
@@ -545,8 +564,8 @@
       document.getElementById("lista-sacola").innerHTML = "";
       document.getElementById("detalhes-pedido").innerHTML = "";
       document.getElementById("pedido-finalizado").style.display = "none";
-      document.getElementById("resumo").style.display = "block";
-      limparCampos(); // Limpa tudo
+      
+      limparCampos(); // Limpa e reexibe a interface de pedidos
     }
 </script>
 </body>
