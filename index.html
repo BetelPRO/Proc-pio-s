@@ -44,11 +44,11 @@
           line-height: 1.2;
       }
 
-      /* ALTERADO: Aumentando o espaçamento vertical entre os itens do pedido */
+      /* Aumentando o espaçamento vertical entre os itens do pedido */
       .pedido-item {
-        margin-bottom: 10px; /* Aumentado de 0px para 10px para dar um espaçamento entre os itens */
+        margin-bottom: 10px;
         line-height: 1.2;
-        padding-bottom: 0.7em; /* Aumentado de 0.5em para 0.7em para garantir espaço acima do divisor */
+        padding-bottom: 0.7em;
         border-bottom: 1px dashed #ccc;
       }
 
@@ -56,6 +56,12 @@
           display: block;
           margin-top: 0.2em;
           line-height: 0;
+      }
+
+      /* NOVO: Estilo para o nome do cliente no pedido finalizado */
+      #pedido-finalizado #cliente-nome strong {
+        font-size: 1.6em; /* Tamanho maior para o nome */
+        font-weight: bolder; /* Mais negrito */
       }
 
 
@@ -109,13 +115,13 @@
       font-size: 1em;
     }
 
-    /* Força a exibição de cada label de produto em uma nova linha (alteração anterior) */
+    /* Força a exibição de cada label de produto em uma nova linha */
     #produtos label {
         display: block !important;
         margin-bottom: 0.6em; 
     }
 
-    /* NOVO: Estilo para a div que contém os produtos de cada categoria (alteração anterior) */
+    /* Estilo para a div que contém os produtos de cada categoria */
     .produtos-categoria {
         padding: 5px 10px;
         border: 1px solid #eee;
@@ -605,7 +611,7 @@
           return;
       }
       
-      // NOVO: OCULTA TODOS OS ELEMENTOS DA INTERFACE DE PEDIDOS
+      // OCULTA TODOS OS ELEMENTOS DA INTERFACE DE PEDIDOS
       document.getElementById('logo-principal').style.display = 'none'; 
       document.getElementById('identificacao-cliente').style.display = 'none'; 
       document.getElementById('comanda').style.display = 'none'; 
@@ -623,10 +629,11 @@
         logo.className = "pedido-logo";
         detalhes.appendChild(logo);
 
-        // Adiciona o nome do cliente CONFIRMADO no topo do pedido
+        // ALTERADO: Adiciona o nome do cliente com formatação invertida
         const clienteDiv = document.createElement("div");
         clienteDiv.style.marginBottom = "1em";
-        clienteDiv.innerHTML = `<strong>CLIENTE:</strong> ${nomeCliente}`;
+        clienteDiv.id = "cliente-nome"; // NOVO: Adiciona um ID para estilização CSS
+        clienteDiv.innerHTML = `CLIENTE: <strong>${nomeCliente}</strong>`;
         detalhes.appendChild(clienteDiv);
 
         let total = 0;
