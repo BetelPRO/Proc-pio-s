@@ -102,14 +102,12 @@
       font-size: 1em;
     }
 
-    /* NOVO CÓDIGO: Força a exibição de cada label de produto em uma nova linha */
+    /* REFORÇO: Garante que os rótulos de produto usem toda a linha (alteração anterior) */
     #produtos label {
         display: block !important;
-        margin-bottom: 0.6em; /* Pequeno ajuste de espaçamento */
+        margin-bottom: 0.6em; 
     }
-    /* FIM NOVO CÓDIGO */
-
-
+    
     input[type="number"],
     input[type="text"],
     button {
@@ -341,6 +339,16 @@
             acompDiv.style.display = "none";
             return;
         }
+        
+        // NOVO CÓDIGO: Verifica se APENAS produtos de Mousse foram selecionados
+        const isOnlyMousse = produtosSelecionados.every(p => menuCategorizado['Mousse'].hasOwnProperty(p.value));
+
+        if (isOnlyMousse) {
+            acompDiv.style.display = "none";
+            document.getElementById("quantidade").value = 1; // Ajusta quantidade, já que Mousse é geralmente unitário.
+            return;
+        }
+
 
         acompDiv.style.display = "block"; // Garante que a div principal de acompanhamentos esteja visível
 
@@ -407,30 +415,43 @@
         alert("Por favor, selecione ao menos um produto.");
         return;
       }
+        
+      // NOVO CÓDIGO: Lista de produtos Mousse para verificação
+      const mousseProdutos = Object.keys(menuCategorizado['Mousse']);
+
 
       produtosSelecionados.forEach(p => {
+        let produtoNome = p.value;
         let acompanhamentosFinaisParaEsteItem = [];
-        let isGeralProduct = produtosComAcompanhamentosGerais.includes(p.value);
-        let isSpecificProduct = produtosComAcompanhamentosEspecificos[p.value];
+        let isMousse = mousseProdutos.includes(produtoNome); // Verifica se é Mousse
+        
+        if (isMousse) {
+            // Se for Mousse, o array de acompanhamentos permanece vazio.
+        } else {
+            // Se NÃO é Mousse, aplica a lógica de acompanhamentos existente
+            let isGeralProduct = produtosComAcompanhamentosGerais.includes(produtoNome);
+            let isSpecificProduct = produtosComAcompanhamentosEspecificos[produtoNome];
 
-        if (isGeralProduct) {
-            acompanhamentosFinaisParaEsteItem = acompSelecionados.map(a => a.value);
-        } else if (isSpecificProduct) {
-            const permitidosEspecificos = produtosComAcompanhamentosEspecificos[p.value];
-            const todosAcompanhamentosPermitidos = new Set([...permitidosEspecificos, ...acompanhamentosUniversais]);
-            acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => todosAcompanhamentosPermitidos.has(a.value)).map(a => a.value);
+            if (isGeralProduct) {
+                acompanhamentosFinaisParaEsteItem = acompSelecionados.map(a => a.value);
+            } else if (isSpecificProduct) {
+                const permitidosEspecificos = produtosComAcompanhamentosEspecificos[produtoNome];
+                const todosAcompanhamentosPermitidos = new Set([...permitidosEspecificos, ...acompanhamentosUniversais]);
+                acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => todosAcompanhamentosPermitidos.has(a.value)).map(a => a.value);
 
-        } else {
-            acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => acompanhamentosUniversais.includes(a.value)).map(a => a.value);
-        }
+            } else {
+                // Se não é geral nem específico (mas também não é Mousse), aplica a regra mais restritiva dos universais
+                acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => acompanhamentosUniversais.includes(a.value)).map(a => a.value);
+            }
 
-        acompanhamentosFinaisParaEsteItem = [...new Set(acompanhamentosFinaisParaEsteItem)];
+            acompanhamentosFinaisParaEsteItem = [...new Set(acompanhamentosFinaisParaEsteItem)];
+        }
 
 
         sacola.push({
-          produto: p.value,
+          produto: produtoNome,
           qtd: qtd,
-          preco: precos[p.value] * qtd,
+          preco: precos[produtoNome] * qtd,
           acompanhamentos: acompanhamentosFinaisParaEsteItem
         });
       });
@@ -445,7 +466,10 @@
       lista.innerHTML = "";
       sacola.forEach((item) => {
         const li = document.createElement("li");
-        li.textContent = `${item.qtd}x ${item.produto} - R$ ${item.preco.toFixed(2)}`;
+        
+        let acompText = item.acompanhamentos.length > 0 ? ` (+ ${item.acompanhamentos.join(', ')})` : '';
+
+        li.textContent = `${item.qtd}x ${item.produto} - R$ ${item.preco.toFixed(2)}${acompText}`;
         lista.appendChild(li);
       });
     }
