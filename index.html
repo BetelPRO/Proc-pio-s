@@ -232,12 +232,12 @@
              'Belga (Cupuaçu)': 19
         },
         "Mousse": {
-            'Rubra': 6,
-            'Sicília': 6,
-            'Solis': 6,
-            'Áurea': 7,
-            'Belga': 8,
-            'Ninho': 8
+            'Mousse Rubra': 6,
+            'Mousse Sicília': 6,
+            'Mousse Solis': 6,
+            'Mousse Áurea': 7,
+            'Mousse Belga': 8,
+            'Mousse Ninho': 8
         }
     };
 
@@ -254,11 +254,11 @@
       'Açaí com Cupuaçu 300ml', 'Açaí com Cupuaçu 400ml', 'Açaí com Cupuaçu 500ml',
       'Cupuaçu 300ml', 'Cupuaçu 400ml', 'Cupuaçu 500ml',
       'Ninho 400ml', 'Ninho 500ml',
-       'Solis'
     ];
 
     // Produtos que terão acompanhamentos estritamente específicos
     const produtosComAcompanhamentosEspecificos = {
+        'Solis': ['Leite Condensado'],
         'Rubra': ['Leite Condensado', 'Morango (Fruta)'],
         'Rubra Imperial': ['Leite Condensado', 'Morango (Fruta)'],
         'Rubra (Cupuaçu)': ['Leite Condensado', 'Morango (Fruta)'],
@@ -276,9 +276,10 @@
     // Acompanhamentos que estarão SEMPRE disponíveis (Universais)
     const acompanhamentosUniversais = [
         'Leite Condensado',
+        'Morango (Cobertura)',
+        'Chocolate (Cobertura)',
         'Morango (Fruta)',
         'Uva',
-        'Calda de Chocolate',
         'Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini'
     ];
 
