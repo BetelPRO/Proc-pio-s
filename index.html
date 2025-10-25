@@ -44,10 +44,11 @@
           line-height: 1.2;
       }
 
+      /* ALTERADO: Aumentando o espaçamento vertical entre os itens do pedido */
       .pedido-item {
-        margin-bottom: 0px;
+        margin-bottom: 10px; /* Aumentado de 0px para 10px para dar um espaçamento entre os itens */
         line-height: 1.2;
-        padding-bottom: 0.5em;
+        padding-bottom: 0.7em; /* Aumentado de 0.5em para 0.7em para garantir espaço acima do divisor */
         border-bottom: 1px dashed #ccc;
       }
 
@@ -108,13 +109,13 @@
       font-size: 1em;
     }
 
-    /* Força a exibição de cada label de produto em uma nova linha */
+    /* Força a exibição de cada label de produto em uma nova linha (alteração anterior) */
     #produtos label {
         display: block !important;
         margin-bottom: 0.6em; 
     }
 
-    /* NOVO: Estilo para a div que contém os produtos de cada categoria */
+    /* NOVO: Estilo para a div que contém os produtos de cada categoria (alteração anterior) */
     .produtos-categoria {
         padding: 5px 10px;
         border: 1px solid #eee;
@@ -225,12 +226,12 @@
              'Belga (Cupuaçu)': 19
         },
         "Mousse": {
-            'Mousse Rubra': 6,
-            'Mousse Sicília': 6,
-            'Mousse Solis': 6,
-            'Mousse Áurea': 7,
-            'Mousse Belga': 8,
-            'Mousse Ninho': 8
+            'Rubra': 6,
+            'Sicília': 6,
+            'Solis': 6,
+            'Áurea': 7,
+            'Belga': 8,
+            'Ninho': 8
         }
     };
 
@@ -247,19 +248,19 @@
       'Açaí com Cupuaçu 300ml', 'Açaí com Cupuaçu 400ml', 'Açaí com Cupuaçu 500ml',
       'Cupuaçu 300ml', 'Cupuaçu 400ml', 'Cupuaçu 500ml',
       'Ninho 400ml', 'Ninho 500ml',
+       'Solis'
     ];
 
     // Produtos que terão acompanhamentos estritamente específicos
     const produtosComAcompanhamentosEspecificos = {
-        'Rubra': ['Leite Condensado'],
-        'Sicília': ['Leite Condensado'],
-        'Solis': ['Leite Condensado'],
-        'Áurea': ['Leite Condensado'],
+        'Rubra': ['Leite Condensado', 'Morango (Fruta)'],
         'Rubra Imperial': ['Leite Condensado', 'Morango (Fruta)'],
-        'Rubra (Cupuaçu)':['Leite Condensado'],
+        'Rubra (Cupuaçu)': ['Leite Condensado', 'Morango (Fruta)'],
         'Belga': ['Leite Condensado', 'Chocoball'],
         'Belga (Cupuaçu)': ['Leite Condensado', 'Chocoball'],
-        'Sicília Régia': ['Leite Condensado', 'Uva']
+        'Sicília Régia': ['Leite Condensado', 'Uva'],
+        'Sicília': ['Leite Condensado', 'Uva'],
+        'Áurea': ['Leite Condensado'],
     };
     
     // Lista de Mousse para lógica de acompanhamentos
@@ -269,16 +270,15 @@
     // Acompanhamentos que estarão SEMPRE disponíveis (Universais)
     const acompanhamentosUniversais = [
         'Leite Condensado',
-        'Morango (Cobertura)',
-        'Chocolate (Cobertura)',
         'Morango (Fruta)',
         'Uva',
+        'Calda de Chocolate',
         'Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini'
     ];
 
     // Acompanhamentos por categoria
     const acompanhamentosLista = {
-      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate (Cobertura)'],
+      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de Chocolate'],
       "Farinhas": ['Leite', 'Paçoca', 'Granola'],
       "Guloseimas": ['Confete', 'Chocoball', 'Jujuba'],
       "Frutas": ['Banana', 'Uva', 'Morango (Fruta)'],
@@ -556,7 +556,7 @@
         document.getElementById("acompanhamentos").style.display = "none";
         document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
         
-        // NOVO: Esconde todas as categorias abertas ao limpar/recomeçar
+        // Esconde todas as categorias abertas ao limpar/recomeçar
         document.querySelectorAll('.produtos-categoria').forEach(div => div.style.display = 'none');
         document.querySelectorAll('#produtos h4').forEach(h4 => h4.style.backgroundColor = '#f0f0f0'); // Remove destaque
     }
