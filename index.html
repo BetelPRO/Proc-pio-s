@@ -85,11 +85,17 @@
       margin-top: 2em;
       font-size: clamp(1.4rem, 5vw, 2rem);
     }
-    /* Ajuste no h4 para as categorias de produto ficarem menos espaçadas que o h3 principal */
+    /* AJUSTES NA CATEGORIA: AGORA É UM BOTÃO VISUAL, MENOS MARGEM NO TOPO */
     .grupo > h4 {
         margin-top: 1em;
         margin-bottom: 0.5em;
         font-size: clamp(1.2rem, 4vw, 1.8rem);
+        cursor: pointer;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        user-select: none;
     }
 
     .grupo {
@@ -102,10 +108,19 @@
       font-size: 1em;
     }
 
-    /* REFORÇO: Garante que os rótulos de produto usem toda a linha (alteração anterior) */
+    /* Força a exibição de cada label de produto em uma nova linha */
     #produtos label {
         display: block !important;
         margin-bottom: 0.6em; 
+    }
+
+    /* NOVO: Estilo para a div que contém os produtos de cada categoria */
+    .produtos-categoria {
+        padding: 5px 10px;
+        border: 1px solid #eee;
+        border-top: none;
+        margin-top: -5px; /* Compensa a margem do h4 */
+        margin-bottom: 1em;
     }
     
     input[type="number"],
@@ -152,11 +167,12 @@
     </div>
 
   <div id="comanda" class="grupo">     <h3>Comanda</h3>
-    <div id="produtos"></div>
+    <div id="produtos">
+        </div>
     <label for="quantidade">Quantidade:</label>
     <input type="number" min="1" max="10" id="quantidade" value="1">
   </div>
-
+    
   <div id="acompanhamentos" class="grupo" style="display: none;">
     <h3>Acompanhamentos</h3>
   </div>
@@ -245,6 +261,10 @@
         'Sicília': ['Leite Condensado', 'Uva'],
         'Áurea': ['Leite Condensado'],
     };
+    
+    // Lista de Mousse para lógica de acompanhamentos
+    const mousseProdutos = Object.keys(menuCategorizado['Mousse']);
+
 
     // Acompanhamentos que estarão SEMPRE disponíveis (Universais)
     const acompanhamentosUniversais = [
@@ -267,13 +287,67 @@
     const produtosDiv = document.getElementById("produtos");
     produtosDiv.innerHTML = '';
 
-    // Loop de Exibição dos Produtos
+
+    /*
+    * NOVO: FUNÇÃO PARA CONTROLAR A VISIBILIDADE DAS CATEGORIAS
+    */
+    function toggleCategoria(categoriaNome) {
+        const divProdutos = document.getElementById(`produtos-${categoriaNome}`);
+        const h4Element = document.getElementById(`h4-${categoriaNome}`);
+        
+        if (!divProdutos) return;
+
+        // Itera sobre todas as divs de produtos, exceto a atual, e as esconde
+        document.querySelectorAll('.produtos-categoria').forEach(div => {
+            if (div.id !== divProdutos.id) {
+                div.style.display = 'none';
+            }
+        });
+        
+        // Itera sobre todos os H4 de categoria, exceto o atual, e desmarca seus produtos
+        document.querySelectorAll('#produtos h4').forEach(h4 => {
+            if (h4.id !== h4Element.id) {
+                // Remove qualquer destaque se for o caso (opcional)
+                h4.style.backgroundColor = '#f0f0f0'; 
+                // Desmarca todos os checkboxes de categorias não selecionadas para evitar confusão
+                const idDiv = h4.id.replace('h4-', 'produtos-');
+                document.querySelectorAll(`#${idDiv} input[name="produto"]`).forEach(cb => cb.checked = false);
+            }
+        });
+
+        // Alterna a visibilidade da div da categoria clicada
+        if (divProdutos.style.display === 'block') {
+            divProdutos.style.display = 'none';
+            h4Element.style.backgroundColor = '#f0f0f0';
+        } else {
+            divProdutos.style.display = 'block';
+            h4Element.style.backgroundColor = '#ccc'; // Destaca a categoria aberta
+            divProdutos.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        
+        // Chama mostrarAcompanhamentos após a manipulação dos checkboxes, se necessário
+        mostrarAcompanhamentos();
+    }
+
+
+    // Loop de Exibição dos Produtos REESTRUTURADO
     for (const [categoria, produtos] of Object.entries(menuCategorizado)) {
         if (Object.keys(produtos).length > 0) {
+            const categoriaId = categoria.replace(/\s/g, ''); // Cria um ID limpo (ex: "Tradicional")
+            
+            // 1. Cria o H4 (botão de categoria)
             const h4 = document.createElement("h4");
             h4.textContent = categoria;
+            h4.id = `h4-${categoriaId}`;
+            h4.onclick = () => toggleCategoria(categoriaId); // Chama a nova função ao clicar
             produtosDiv.appendChild(h4);
 
+            // 2. Cria a DIV que contém os produtos (escondida por padrão)
+            const divProdutosCategoria = document.createElement("div");
+            divProdutosCategoria.id = `produtos-${categoriaId}`;
+            divProdutosCategoria.className = 'produtos-categoria';
+            divProdutosCategoria.style.display = 'none'; // Começa escondida
+            
             for (const [prod, preco] of Object.entries(produtos)) {
                 const label = document.createElement("label");
                 const checkbox = document.createElement("input");
@@ -283,13 +357,16 @@
                 checkbox.onclick = mostrarAcompanhamentos;
                 label.appendChild(checkbox);
                 label.appendChild(document.createTextNode(prod + " - R$ " + preco.toFixed(2)));
-                produtosDiv.appendChild(label);
+                divProdutosCategoria.appendChild(label); // Anexa à nova div
             }
+            
+            produtosDiv.appendChild(divProdutosCategoria); // Adiciona a div de produtos à div principal
         }
     }
 
+
     const acompDiv = document.getElementById("acompanhamentos");
-    // Preenche a div de acompanhamentos
+    // Preenche a div de acompanhamentos (Sem alteração)
     for (const [categoria, itens] of Object.entries(acompanhamentosLista)) {
         const h4 = document.createElement("h4");
         h4.textContent = categoria;
@@ -308,7 +385,7 @@
         });
     }
 
-    // NOVA FUNÇÃO: Confirma e salva o nome do cliente
+    // NOVA FUNÇÃO: Confirma e salva o nome do cliente (Sem alteração)
     function confirmarNomeCliente() {
         const inputNome = document.getElementById("nome-cliente");
         const botaoConfirmar = document.getElementById("botao-confirmar-nome");
@@ -340,12 +417,12 @@
             return;
         }
         
-        // NOVO CÓDIGO: Verifica se APENAS produtos de Mousse foram selecionados
-        const isOnlyMousse = produtosSelecionados.every(p => menuCategorizado['Mousse'].hasOwnProperty(p.value));
+        // Verifica se APENAS produtos de Mousse foram selecionados
+        const isOnlyMousse = produtosSelecionados.every(p => mousseProdutos.includes(p.value));
 
         if (isOnlyMousse) {
             acompDiv.style.display = "none";
-            document.getElementById("quantidade").value = 1; // Ajusta quantidade, já que Mousse é geralmente unitário.
+            document.getElementById("quantidade").value = 1; 
             return;
         }
 
@@ -416,14 +493,10 @@
         return;
       }
         
-      // NOVO CÓDIGO: Lista de produtos Mousse para verificação
-      const mousseProdutos = Object.keys(menuCategorizado['Mousse']);
-
-
       produtosSelecionados.forEach(p => {
         let produtoNome = p.value;
         let acompanhamentosFinaisParaEsteItem = [];
-        let isMousse = mousseProdutos.includes(produtoNome); // Verifica se é Mousse
+        let isMousse = mousseProdutos.includes(produtoNome);
         
         if (isMousse) {
             // Se for Mousse, o array de acompanhamentos permanece vazio.
@@ -481,6 +554,10 @@
         document.getElementById("quantidade").value = 1;
         document.getElementById("acompanhamentos").style.display = "none";
         document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
+        
+        // NOVO: Esconde todas as categorias abertas ao limpar/recomeçar
+        document.querySelectorAll('.produtos-categoria').forEach(div => div.style.display = 'none');
+        document.querySelectorAll('#produtos h4').forEach(h4 => h4.style.backgroundColor = '#f0f0f0'); // Remove destaque
     }
 
     // Função que limpa tudo, incluindo o nome e reabilita o campo
@@ -564,7 +641,7 @@
                 Coberturas: ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de Chocolate', 'Calda de morango'],
                 Farinhas: ['Leite', 'Paçoca', 'Granola'],
                 Guloseimas: ['Confete', 'Chocoball', 'Jujuba'],
-                Frutas: ['Banana', 'Uva', 'Morango (Fruta)', 'Morango'],
+                Frutas: ['Banana', 'Uva', 'Morango (Fruta)'],
                 Adicionais: ['Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini']
             };
 
