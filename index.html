@@ -44,9 +44,9 @@
           line-height: 1.2;
       }
 
-      /* Aumentando o espaçamento vertical entre os itens do pedido */
+      /* ALTERADO: Aumentando o espaçamento vertical entre os itens do pedido para 20px */
       .pedido-item {
-        margin-bottom: 10px;
+        margin-bottom: 20px; /* AUMENTADO PARA DOBRAR O ESPAÇAMENTO */
         line-height: 1.2;
         padding-bottom: 0.7em;
         border-bottom: 1px dashed #ccc;
@@ -115,21 +115,21 @@
       font-size: 1em;
     }
 
-    /* Força a exibição de cada label de produto em uma nova linha */
-    #produtos label {
-        display: block !important;
-        margin-bottom: 0.6em; 
-    }
+    /* Força a exibição de cada label de produto em uma nova linha */
+    #produtos label {
+        display: block !important;
+        margin-bottom: 0.6em; 
+    }
 
-    /* Estilo para a div que contém os produtos de cada categoria */
-    .produtos-categoria {
-        padding: 5px 10px;
-        border: 1px solid #eee;
-        border-top: none;
-        margin-top: -5px; /* Compensa a margem do h4 */
-        margin-bottom: 1em;
-    }
-    
+    /* Estilo para a div que contém os produtos de cada categoria */
+    .produtos-categoria {
+        padding: 5px 10px;
+        border: 1px solid #eee;
+        border-top: none;
+        margin-top: -5px; /* Compensa a margem do h4 */
+        margin-bottom: 1em;
+    }
+    
     input[type="number"],
     input[type="text"],
     button {
@@ -175,11 +175,11 @@
 
   <div id="comanda" class="grupo">     <h3>Comanda</h3>
     <div id="produtos">
-        </div>
+        </div>
     <label for="quantidade">Quantidade:</label>
     <input type="number" min="1" max="10" id="quantidade" value="1">
   </div>
-    
+    
   <div id="acompanhamentos" class="grupo" style="display: none;">
     <h3>Acompanhamentos</h3>
   </div>
@@ -268,16 +268,16 @@
         'Sicília': ['Leite Condensado', 'Uva'],
         'Áurea': ['Leite Condensado'],
     };
-    
-    // Lista de Mousse para lógica de acompanhamentos
-    const mousseProdutos = Object.keys(menuCategorizado['Mousse']);
+    
+    // Lista de Mousse para lógica de acompanhamentos
+    const mousseProdutos = Object.keys(menuCategorizado['Mousse']);
 
 
     // Acompanhamentos que estarão SEMPRE disponíveis (Universais)
     const acompanhamentosUniversais = [
         'Leite Condensado',
-        'Morango (Cobertura)',
-        'Chocolate (Cobertura)',
+        'Morango (Cobertura)',
+        'Chocolate (Cobertura)',
         'Morango (Fruta)',
         'Uva',
         'Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini'
@@ -296,66 +296,66 @@
     produtosDiv.innerHTML = '';
 
 
-    /*
-    * NOVO: FUNÇÃO PARA CONTROLAR A VISIBILIDADE DAS CATEGORIAS
-    */
-    function toggleCategoria(categoriaNome) {
-        const divProdutos = document.getElementById(`produtos-${categoriaNome}`);
-        const h4Element = document.getElementById(`h4-${categoriaNome}`);
-        
-        if (!divProdutos) return;
+    /*
+    * NOVO: FUNÇÃO PARA CONTROLAR A VISIBILIDADE DAS CATEGORIAS
+    */
+    function toggleCategoria(categoriaNome) {
+        const divProdutos = document.getElementById(`produtos-${categoriaNome}`);
+        const h4Element = document.getElementById(`h4-${categoriaNome}`);
+        
+        if (!divProdutos) return;
 
-        // Itera sobre todas as divs de produtos, exceto a atual, e as esconde
-        document.querySelectorAll('.produtos-categoria').forEach(div => {
-            if (div.id !== divProdutos.id) {
-                div.style.display = 'none';
-            }
-        });
-        
-        // Itera sobre todos os H4 de categoria, exceto o atual, e desmarca seus produtos
-        document.querySelectorAll('#produtos h4').forEach(h4 => {
-            if (h4.id !== h4Element.id) {
-                // Remove qualquer destaque se for o caso (opcional)
-                h4.style.backgroundColor = '#f0f0f0'; 
-                // Desmarca todos os checkboxes de categorias não selecionadas para evitar confusão
-                const idDiv = h4.id.replace('h4-', 'produtos-');
-                document.querySelectorAll(`#${idDiv} input[name="produto"]`).forEach(cb => cb.checked = false);
-            }
-        });
+        // Itera sobre todas as divs de produtos, exceto a atual, e as esconde
+        document.querySelectorAll('.produtos-categoria').forEach(div => {
+            if (div.id !== divProdutos.id) {
+                div.style.display = 'none';
+            }
+        });
+        
+        // Itera sobre todos os H4 de categoria, exceto o atual, e desmarca seus produtos
+        document.querySelectorAll('#produtos h4').forEach(h4 => {
+            if (h4.id !== h4Element.id) {
+                // Remove qualquer destaque se for o caso (opcional)
+                h4.style.backgroundColor = '#f0f0f0'; 
+                // Desmarca todos os checkboxes de categorias não selecionadas para evitar confusão
+                const idDiv = h4.id.replace('h4-', 'produtos-');
+                document.querySelectorAll(`#${idDiv} input[name="produto"]`).forEach(cb => cb.checked = false);
+            }
+        });
 
-        // Alterna a visibilidade da div da categoria clicada
-        if (divProdutos.style.display === 'block') {
-            divProdutos.style.display = 'none';
-            h4Element.style.backgroundColor = '#f0f0f0';
-        } else {
-            divProdutos.style.display = 'block';
-            h4Element.style.backgroundColor = '#ccc'; // Destaca a categoria aberta
-            divProdutos.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-        
-        // Chama mostrarAcompanhamentos após a manipulação dos checkboxes, se necessário
-        mostrarAcompanhamentos();
-    }
+        // Alterna a visibilidade da div da categoria clicada
+        if (divProdutos.style.display === 'block') {
+            divProdutos.style.display = 'none';
+            h4Element.style.backgroundColor = '#f0f0f0';
+        } else {
+            divProdutos.style.display = 'block';
+            h4Element.style.backgroundColor = '#ccc'; // Destaca a categoria aberta
+            divProdutos.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        
+        // Chama mostrarAcompanhamentos após a manipulação dos checkboxes, se necessário
+        mostrarAcompanhamentos();
+    }
 
 
     // Loop de Exibição dos Produtos REESTRUTURADO
     for (const [categoria, produtos] of Object.entries(menuCategorizado)) {
         if (Object.keys(produtos).length > 0) {
             const categoriaId = categoria.replace(/\s/g, ''); // Cria um ID limpo (ex: "Tradicional")
-            
-            // 1. Cria o H4 (botão de categoria)
+            
+            // 1. Cria o H4 (botão de categoria)
             const h4 = document.createElement("h4");
             h4.textContent = categoria;
-            h4.id = `h4-${categoriaId}`;
-            h4.onclick = () => toggleCategoria(categoriaId); // Chama a nova função ao clicar
+            h4.id = `h4-${categoriaId}`;
+            h4.onclick = () => toggleCategoria(categoriaId); // Chama a nova função ao clicar
             produtosDiv.appendChild(h4);
 
-            // 2. Cria a DIV que contém os produtos (escondida por padrão)
-            const divProdutosCategoria = document.createElement("div");
-            divProdutosCategoria.id = `produtos-${categoriaId}`;
-            divProdutosCategoria.className = 'produtos-categoria';
-            divProdutosCategoria.style.display = 'none'; // Começa escondida
-            
+            // 2. Cria a DIV que contém os produtos (escondida por padrão)
+            const divProdutosCategoria = document.createElement("div");
+            divProdutosCategoria.id = `produtos-${categoriaId}`;
+            divProdutosCategoria.className = 'produtos-categoria';
+            divProdutosCategoria.style.display = 'none'; // Começa escondida
+            
             for (const [prod, preco] of Object.entries(produtos)) {
                 const label = document.createElement("label");
                 const checkbox = document.createElement("input");
@@ -367,8 +367,8 @@
                 label.appendChild(document.createTextNode(prod + " - R$ " + preco.toFixed(2)));
                 divProdutosCategoria.appendChild(label); // Anexa à nova div
             }
-            
-            produtosDiv.appendChild(divProdutosCategoria); // Adiciona a div de produtos à div principal
+            
+            produtosDiv.appendChild(divProdutosCategoria); // Adiciona a div de produtos à div principal
         }
     }
 
@@ -424,15 +424,15 @@
             acompDiv.style.display = "none";
             return;
         }
-        
-        // Verifica se APENAS produtos de Mousse foram selecionados
-        const isOnlyMousse = produtosSelecionados.every(p => mousseProdutos.includes(p.value));
+        
+        // Verifica se APENAS produtos de Mousse foram selecionados
+        const isOnlyMousse = produtosSelecionados.every(p => mousseProdutos.includes(p.value));
 
-        if (isOnlyMousse) {
-            acompDiv.style.display = "none";
-            document.getElementById("quantidade").value = 1; 
-            return;
-        }
+        if (isOnlyMousse) {
+            acompDiv.style.display = "none";
+            document.getElementById("quantidade").value = 1; 
+            return;
+        }
 
 
         acompDiv.style.display = "block"; // Garante que a div principal de acompanhamentos esteja visível
@@ -500,33 +500,33 @@
         alert("Por favor, selecione ao menos um produto.");
         return;
       }
-        
+        
       produtosSelecionados.forEach(p => {
-        let produtoNome = p.value;
+        let produtoNome = p.value;
         let acompanhamentosFinaisParaEsteItem = [];
-        let isMousse = mousseProdutos.includes(produtoNome);
-        
-        if (isMousse) {
-            // Se for Mousse, o array de acompanhamentos permanece vazio.
-        } else {
-            // Se NÃO é Mousse, aplica a lógica de acompanhamentos existente
-            let isGeralProduct = produtosComAcompanhamentosGerais.includes(produtoNome);
-            let isSpecificProduct = produtosComAcompanhamentosEspecificos[produtoNome];
+        let isMousse = mousseProdutos.includes(produtoNome);
+        
+        if (isMousse) {
+            // Se for Mousse, o array de acompanhamentos permanece vazio.
+        } else {
+            // Se NÃO é Mousse, aplica a lógica de acompanhamentos existente
+            let isGeralProduct = produtosComAcompanhamentosGerais.includes(produtoNome);
+            let isSpecificProduct = produtosComAcompanhamentosEspecificos[produtoNome];
 
-            if (isGeralProduct) {
-                acompanhamentosFinaisParaEsteItem = acompSelecionados.map(a => a.value);
-            } else if (isSpecificProduct) {
-                const permitidosEspecificos = produtosComAcompanhamentosEspecificos[produtoNome];
-                const todosAcompanhamentosPermitidos = new Set([...permitidosEspecificos, ...acompanhamentosUniversais]);
-                acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => todosAcompanhamentosPermitidos.has(a.value)).map(a => a.value);
+            if (isGeralProduct) {
+                acompanhamentosFinaisParaEsteItem = acompSelecionados.map(a => a.value);
+            } else if (isSpecificProduct) {
+                const permitidosEspecificos = produtosComAcompanhamentosEspecificos[produtoNome];
+                const todosAcompanhamentosPermitidos = new Set([...permitidosEspecificos, ...acompanhamentosUniversais]);
+                acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => todosAcompanhamentosPermitidos.has(a.value)).map(a => a.value);
 
-            } else {
-                // Se não é geral nem específico (mas também não é Mousse), aplica a regra mais restritiva dos universais
-                acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => acompanhamentosUniversais.includes(a.value)).map(a => a.value);
-            }
+            } else {
+                // Se não é geral nem específico (mas também não é Mousse), aplica a regra mais restritiva dos universais
+                acompanhamentosFinaisParaEsteItem = acompSelecionados.filter(a => acompanhamentosUniversais.includes(a.value)).map(a => a.value);
+            }
 
-            acompanhamentosFinaisParaEsteItem = [...new Set(acompanhamentosFinaisParaEsteItem)];
-        }
+            acompanhamentosFinaisParaEsteItem = [...new Set(acompanhamentosFinaisParaEsteItem)];
+        }
 
 
         sacola.push({
@@ -547,7 +547,7 @@
       lista.innerHTML = "";
       sacola.forEach((item) => {
         const li = document.createElement("li");
-        
+        
         let acompText = item.acompanhamentos.length > 0 ? ` (+ ${item.acompanhamentos.join(', ')})` : '';
 
         li.textContent = `${item.qtd}x ${item.produto} - R$ ${item.preco.toFixed(2)}${acompText}`;
@@ -562,10 +562,10 @@
         document.getElementById("quantidade").value = 1;
         document.getElementById("acompanhamentos").style.display = "none";
         document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
-        
-        // Esconde todas as categorias abertas ao limpar/recomeçar
-        document.querySelectorAll('.produtos-categoria').forEach(div => div.style.display = 'none');
-        document.querySelectorAll('#produtos h4').forEach(h4 => h4.style.backgroundColor = '#f0f0f0'); // Remove destaque
+        
+        // Esconde todas as categorias abertas ao limpar/recomeçar
+        document.querySelectorAll('.produtos-categoria').forEach(div => div.style.display = 'none');
+        document.querySelectorAll('#produtos h4').forEach(h4 => h4.style.backgroundColor = '#f0f0f0'); // Remove destaque
     }
 
     // Função que limpa tudo, incluindo o nome e reabilita o campo
@@ -633,7 +633,7 @@
         // ALTERADO: Adiciona o nome do cliente com formatação invertida
         const clienteDiv = document.createElement("div");
         clienteDiv.style.marginBottom = "1em";
-        clienteDiv.id = "cliente-nome"; // NOVO: Adiciona um ID para estilização CSS
+        clienteDiv.id = "cliente-nome"; // NOVO: Adiciona um ID para estilização CSS
         clienteDiv.innerHTML = `CLIENTE: <strong>${nomeCliente}</strong>`;
         detalhes.appendChild(clienteDiv);
 
