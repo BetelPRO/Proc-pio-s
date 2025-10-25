@@ -247,19 +247,14 @@
       'Açaí com Cupuaçu 300ml', 'Açaí com Cupuaçu 400ml', 'Açaí com Cupuaçu 500ml',
       'Cupuaçu 300ml', 'Cupuaçu 400ml', 'Cupuaçu 500ml',
       'Ninho 400ml', 'Ninho 500ml',
-       'Solis'
     ];
 
     // Produtos que terão acompanhamentos estritamente específicos
     const produtosComAcompanhamentosEspecificos = {
-        'Rubra': ['Leite Condensado', 'Morango (Fruta)'],
         'Rubra Imperial': ['Leite Condensado', 'Morango (Fruta)'],
-        'Rubra (Cupuaçu)': ['Leite Condensado', 'Morango (Fruta)'],
         'Belga': ['Leite Condensado', 'Chocoball'],
         'Belga (Cupuaçu)': ['Leite Condensado', 'Chocoball'],
         'Sicília Régia': ['Leite Condensado', 'Uva'],
-        'Sicília': ['Leite Condensado', 'Uva'],
-        'Áurea': ['Leite Condensado'],
     };
     
     // Lista de Mousse para lógica de acompanhamentos
@@ -269,15 +264,16 @@
     // Acompanhamentos que estarão SEMPRE disponíveis (Universais)
     const acompanhamentosUniversais = [
         'Leite Condensado',
+        'Morango (Cobertura),
+        'Chocolate (Cobertura)',
         'Morango (Fruta)',
         'Uva',
-        'Calda de Chocolate',
         'Goma Ácida', 'Goma de Amora', 'Canudinho', 'Marshmallow', 'Fini'
     ];
 
     // Acompanhamentos por categoria
     const acompanhamentosLista = {
-      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate', 'Calda de Chocolate'],
+      "Coberturas": ['Leite Condensado', 'Morango (Cobertura)', 'Chocolate (Cobertura)'],
       "Farinhas": ['Leite', 'Paçoca', 'Granola'],
       "Guloseimas": ['Confete', 'Chocoball', 'Jujuba'],
       "Frutas": ['Banana', 'Uva', 'Morango (Fruta)'],
