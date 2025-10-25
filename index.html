@@ -102,6 +102,14 @@
       font-size: 1em;
     }
 
+    /* NOVO CÓDIGO: Força a exibição de cada label de produto em uma nova linha */
+    #produtos label {
+        display: block !important;
+        margin-bottom: 0.6em; /* Pequeno ajuste de espaçamento */
+    }
+    /* FIM NOVO CÓDIGO */
+
+
     input[type="number"],
     input[type="text"],
     button {
@@ -116,11 +124,11 @@
       cursor: pointer;
     }
 
-    #botao-confirmar-nome {
-        margin-top: 0.5em;
-        background-color: #007bff;
-        color: white;
-    }
+    #botao-confirmar-nome {
+        margin-top: 0.5em;
+        background-color: #007bff;
+        color: white;
+    }
 
     ul {
       padding-left: 1em;
@@ -139,13 +147,13 @@
 </head>
 <body>
 
-  <img id="logo-principal" src="procopios.png" alt="">     <div id="identificacao-cliente" class="grupo">         <h3>Identificação do Cliente</h3>
+  <img id="logo-principal" src="procopios.png" alt="">     <div id="identificacao-cliente" class="grupo">         <h3>Identificação do Cliente</h3>
         <label for="nome-cliente">Nome do Cliente:</label>
         <input type="text" id="nome-cliente" placeholder="Digite o nome do cliente" required>
-        <button id="botao-confirmar-nome" onclick="confirmarNomeCliente()">Confirmar Nome</button>
+        <button id="botao-confirmar-nome" onclick="confirmarNomeCliente()">Confirmar Nome</button>
     </div>
 
-  <div id="comanda" class="grupo">     <h3>Comanda</h3>
+  <div id="comanda" class="grupo">     <h3>Comanda</h3>
     <div id="produtos"></div>
     <label for="quantidade">Quantidade:</label>
     <input type="number" min="1" max="10" id="quantidade" value="1">
@@ -172,7 +180,7 @@
 
   <script>
     const sacola = [];
-    let nomeClienteConfirmado = ""; // VARIÁVEL GLOBAL PARA ARMAZENAR O NOME CONFIRMADO
+    let nomeClienteConfirmado = ""; // VARIÁVEL GLOBAL PARA ARMAZENAR O NOME CONFIRMADO
 
     // Definição do Menu Categorizado
     const menuCategorizado = {
@@ -225,7 +233,7 @@
       'Açaí com Cupuaçu 300ml', 'Açaí com Cupuaçu 400ml', 'Açaí com Cupuaçu 500ml',
       'Cupuaçu 300ml', 'Cupuaçu 400ml', 'Cupuaçu 500ml',
       'Ninho 400ml', 'Ninho 500ml',
-       'Solis'
+       'Solis'
     ];
 
     // Produtos que terão acompanhamentos estritamente específicos
@@ -236,7 +244,7 @@
         'Belga': ['Leite Condensado', 'Chocoball'],
         'Belga (Cupuaçu)': ['Leite Condensado', 'Chocoball'],
         'Sicília Régia': ['Leite Condensado', 'Uva'],
-        'Sicília': ['Leite Condensado', 'Uva'],
+        'Sicília': ['Leite Condensado', 'Uva'],
         'Áurea': ['Leite Condensado'],
     };
 
@@ -302,23 +310,23 @@
         });
     }
 
-    // NOVA FUNÇÃO: Confirma e salva o nome do cliente
-    function confirmarNomeCliente() {
-        const inputNome = document.getElementById("nome-cliente");
-        const botaoConfirmar = document.getElementById("botao-confirmar-nome");
-        const nome = inputNome.value.trim();
+    // NOVA FUNÇÃO: Confirma e salva o nome do cliente
+    function confirmarNomeCliente() {
+        const inputNome = document.getElementById("nome-cliente");
+        const botaoConfirmar = document.getElementById("botao-confirmar-nome");
+        const nome = inputNome.value.trim();
 
-        if (nome === "") {
-            alert("Por favor, digite o nome do cliente.");
-            return;
-        }
+        if (nome === "") {
+            alert("Por favor, digite o nome do cliente.");
+            return;
+        }
 
-        nomeClienteConfirmado = nome; // Armazena o nome na variável global
-        inputNome.disabled = true; // Desabilita o campo
-        botaoConfirmar.disabled = true; // Desabilita o botão
-        botaoConfirmar.textContent = `Nome Confirmado: ${nome}`;
-        botaoConfirmar.style.backgroundColor = '#4CAF50'; // Muda para verde
-    }
+        nomeClienteConfirmado = nome; // Armazena o nome na variável global
+        inputNome.disabled = true; // Desabilita o campo
+        botaoConfirmar.disabled = true; // Desabilita o botão
+        botaoConfirmar.textContent = `Nome Confirmado: ${nome}`;
+        botaoConfirmar.style.backgroundColor = '#4CAF50'; // Muda para verde
+    }
 
 
     function mostrarAcompanhamentos() {
@@ -386,11 +394,11 @@
 
 
     function adicionarItens() {
-      if (nomeClienteConfirmado === "") { // REFORÇA A NECESSIDADE DE CONFIRMAÇÃO DO NOME
-        alert("Por favor, confirme o nome do cliente antes de adicionar itens à sacola.");
-        return;
-      }
-      
+      if (nomeClienteConfirmado === "") { // REFORÇA A NECESSIDADE DE CONFIRMAÇÃO DO NOME
+        alert("Por favor, confirme o nome do cliente antes de adicionar itens à sacola.");
+        return;
+      }
+      
       const produtosSelecionados = Array.from(document.querySelectorAll('input[name="produto"]:checked'));
       const acompSelecionados = Array.from(document.querySelectorAll('input[name="acompanhamento"]:checked'));
       const qtd = parseInt(document.getElementById("quantidade").value);
@@ -429,7 +437,7 @@
 
       atualizarSacola();
       // Usa função auxiliar para limpar apenas itens de produto
-      limparCamposProdutos(); 
+      limparCamposProdutos(); 
     }
 
     function atualizarSacola() {
@@ -441,70 +449,70 @@
         lista.appendChild(li);
       });
     }
-    
-    // Funcao auxiliar para limpar apenas a selecao de produtos
-    function limparCamposProdutos() {
-        document.querySelectorAll('input[name="produto"]').forEach(cb => cb.checked = false);
-        document.querySelectorAll('input[name="acompanhamento"]').forEach(cb => cb.checked = false);
-        document.getElementById("quantidade").value = 1;
-        document.getElementById("acompanhamentos").style.display = "none";
-        document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
-    }
+    
+    // Funcao auxiliar para limpar apenas a selecao de produtos
+    function limparCamposProdutos() {
+        document.querySelectorAll('input[name="produto"]').forEach(cb => cb.checked = false);
+        document.querySelectorAll('input[name="acompanhamento"]').forEach(cb => cb.checked = false);
+        document.getElementById("quantidade").value = 1;
+        document.getElementById("acompanhamentos").style.display = "none";
+        document.querySelectorAll('.acomp-item-label, .acomp-categoria').forEach(el => el.style.display = 'none');
+    }
 
-    // Função que limpa tudo, incluindo o nome e reabilita o campo
+    // Função que limpa tudo, incluindo o nome e reabilita o campo
     function limparCampos() {
       // Limpa campos de produto
       limparCamposProdutos();
 
-      // Limpa e reabilita o campo do cliente
-      const inputNome = document.getElementById("nome-cliente");
-      const botaoConfirmar = document.getElementById("botao-confirmar-nome");
+      // Limpa e reabilita o campo do cliente
+      const inputNome = document.getElementById("nome-cliente");
+      const botaoConfirmar = document.getElementById("botao-confirmar-nome");
 
-      inputNome.value = "";
-      inputNome.disabled = false; // Reabilita
-      botaoConfirmar.disabled = false; // Reabilita
-      botaoConfirmar.textContent = "Confirmar Nome";
-      botaoConfirmar.style.backgroundColor = '#007bff'; // Volta a cor
-      nomeClienteConfirmado = ""; // Limpa a variável global
-      
-      // REEXIBE OS ELEMENTOS ESCONDIDOS PELO fecharPedido()
-      document.getElementById('logo-principal').style.display = 'block'; 
-      document.getElementById('identificacao-cliente').style.display = 'block'; 
-      document.getElementById('comanda').style.display = 'block'; 
-      document.getElementById('btn-adicionar').style.display = 'block'; 
-      document.getElementById('btn-fechar').style.display = 'block'; 
-      document.getElementById('btn-recomecar-pedido').style.display = 'block'; 
-      document.getElementById("resumo").style.display = "block";
+      inputNome.value = "";
+      inputNome.disabled = false; // Reabilita
+      botaoConfirmar.disabled = false; // Reabilita
+      botaoConfirmar.textContent = "Confirmar Nome";
+      botaoConfirmar.style.backgroundColor = '#007bff'; // Volta a cor
+      nomeClienteConfirmado = ""; // Limpa a variável global
+      
+      // REEXIBE OS ELEMENTOS ESCONDIDOS PELO fecharPedido()
+      document.getElementById('logo-principal').style.display = 'block'; 
+      document.getElementById('identificacao-cliente').style.display = 'block'; 
+      document.getElementById('comanda').style.display = 'block'; 
+      document.getElementById('btn-adicionar').style.display = 'block'; 
+      document.getElementById('btn-fechar').style.display = 'block'; 
+      document.getElementById('btn-recomecar-pedido').style.display = 'block'; 
+      document.getElementById("resumo").style.display = "block";
     }
 
     function fecharPedido() {
         const container = document.getElementById("pedido-finalizado");
         const detalhes = document.getElementById("detalhes-pedido");
         detalhes.innerHTML = "";
-        
+        
         const nomeCliente = nomeClienteConfirmado.trim();
 
         if (sacola.length === 0) {
             alert("Sua sacola está vazia.");
             return;
         }
-      
-      if (nomeCliente === "") { 
-          alert("O nome do cliente não foi confirmado. Por favor, confirme o nome para fechar o pedido.");
-          document.getElementById("resumo").style.display = "block";
-          return;
-      }
-      
-      // NOVO: OCULTA TODOS OS ELEMENTOS DA INTERFACE DE PEDIDOS
-      document.getElementById('logo-principal').style.display = 'none'; 
-      document.getElementById('identificacao-cliente').style.display = 'none'; 
-      document.getElementById('comanda').style.display = 'none'; 
-      document.getElementById('acompanhamentos').style.display = 'none'; 
-      document.getElementById('btn-adicionar').style.display = 'none'; 
-      document.getElementById('btn-fechar').style.display = 'none'; 
-      document.getElementById('btn-recomecar-pedido').style.display = 'none'; 
-      document.getElementById("resumo").style.display = "none";
-      // FIM: OCULTAÇÃO FORÇADA DE INTERFACE
+      
+      if (nomeCliente === "") { 
+          alert("O nome do cliente não foi confirmado. Por favor, confirme o nome para fechar o pedido.");
+          document.getElementById("resumo").style.display = "block";
+          return;
+      }
+      
+      // NOVO: OCULTA TODOS OS ELEMENTOS DA INTERFACE DE PEDIDOS
+      document.getElementById('logo-principal').style.display = 'none'; 
+      document.getElementById('identificacao-cliente').style.display = 'none'; 
+      document.getElementById('comanda').style.display = 'none'; 
+      document.getElementById('acompanhamentos').style.display = 'none'; 
+      document.getElementById('btn-adicionar').style.display = 'none'; 
+      document.getElementById('btn-fechar').style.display = 'none'; 
+      document.getElementById('btn-recomecar-pedido').style.display = 'none'; 
+      document.getElementById("resumo").style.display = "none";
+      // FIM: OCULTAÇÃO FORÇADA DE INTERFACE
 
 
         const logo = document.createElement("img");
@@ -522,7 +530,7 @@
         let total = 0;
 
         sacola.forEach(item => {
-            /* ... Lógica de formatação de itens da sacola ... */
+            /* ... Lógica de formatação de itens da sacola ... */
             const div = document.createElement("div");
             div.className = "pedido-item";
 
@@ -552,11 +560,11 @@
         detalhes.appendChild(totalDiv);
 
         container.style.display = "block"; // Exibe a área de impressão
-        
+        
         window.print();
 
-        // IMPORTANTE: Não é necessário reexibir aqui, pois a função `recomecar` fará isso.
-        // O usuário verá apenas o recibo até clicar em Recomeçar.
+        // IMPORTANTE: Não é necessário reexibir aqui, pois a função `recomecar` fará isso.
+        // O usuário verá apenas o recibo até clicar em Recomeçar.
     }
 
     function recomecar() {
@@ -564,7 +572,7 @@
       document.getElementById("lista-sacola").innerHTML = "";
       document.getElementById("detalhes-pedido").innerHTML = "";
       document.getElementById("pedido-finalizado").style.display = "none";
-      
+      
       limparCampos(); // Limpa e reexibe a interface de pedidos
     }
 </script>
